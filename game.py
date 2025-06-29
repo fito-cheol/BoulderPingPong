@@ -1,3 +1,5 @@
+import pygame
+
 from camera import Camera
 from physics import Physics
 from renderer import Renderer
