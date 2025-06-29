@@ -16,19 +16,21 @@ SCALE_FACTOR = 2.0  # 화면 확대 비율
 BALL_SPEED_SCALE = 2.0  # 공 속도 증가 배율 (충돌 후)
 INITIAL_BALL_SPEED_SCALE = 0.5  # 초기 공 속도 배율
 ROUND_END_DELAY = 1.0  # 1-second delay after round ends
-
+좌우반전 = True
+디버깅 = False
 # Color configuration (BGR format)
 COLORS = {
     'hand': (0, 0, 255),  # Red for hands (landmarks 15, 16)
     'foot': (0, 220, 220),  # Yellow for feet (landmarks 27, 28)
     'ball': (255, 255, 255),  # White for ball fill
     'ball_border': (0, 0, 0),  # Black for ball border
+    'score' : (120, 255, 120 ), # 점수 표기 색
     'text': (0, 255, 0),  # Green for text labels
     'landmark_default': (255, 255, 255),  # White for default landmarks
     'connection': (0, 255, 255),  # Cyan for pose connections
     'left_border': (0, 0, 255),  # Red for left border
     'right_border': (255, 0, 0),  # Blue for right border
-    'top_bottom_border': (255, 255, 255),  # Cyan for top/bottom borders
+    'top_bottom_border': (255, 255, 255),  # White for top/bottom borders
     'center_line': (255, 255, 255)  # White for center line
 }
 
@@ -116,7 +118,7 @@ def draw_score(frame: np.ndarray, score: list, config: CameraConfig) -> None:
     text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 1 * SCALE_FACTOR, 2)[0]
     text_x = int((config.width * SCALE_FACTOR - text_size[0]) // 2)
     text_y = int(50 * SCALE_FACTOR)
-    cv2.putText(frame, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1 * SCALE_FACTOR, COLORS['text'], 2, cv2.LINE_AA)
+    cv2.putText(frame, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1 * SCALE_FACTOR, COLORS['score'], 2, cv2.LINE_AA)
 
 def draw_borders_and_center_line(frame: np.ndarray, config: CameraConfig) -> None:
     """Draw semi-transparent rectangular borders and a center line."""
@@ -179,7 +181,8 @@ def process_landmarks(frame: np.ndarray, landmarks: list, config: CameraConfig, 
                     y_m = landmark.y * config.height * (WALL_HEIGHT / config.height)
                     person_positions.append([x_m, y_m])
                     draw_landmark(frame, landmark, idx, config)
-                    draw_landmark_info(frame, person_idx + 1, idx, x_m, y_m, text_y)
+                    if (디버깅):
+                        draw_landmark_info(frame, person_idx + 1, idx, x_m, y_m, text_y)
                     text_y += int(30 * SCALE_FACTOR)
                 except AttributeError as e:
                     print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")
@@ -311,7 +314,12 @@ def main():
                     draw_score(frame_bgr, physics.score, config)
                     physics.update([], 1 / FPS)
 
-                cv2.imshow(window_name, frame_bgr)
+                if (좌우반전):
+                    frame_flipped = cv2.flip(frame_bgr, 1)
+                    cv2.imshow(window_name, frame_flipped)
+                else:
+                    cv2.imshow(window_name, frame_bgr)
+
                 if cv2.waitKey(1) & 0xFF == 27:  # ESC to exit
                     break
 
