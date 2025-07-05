@@ -3,6 +3,7 @@ from camera import Camera
 from physics import Physics
 from renderer import Renderer
 from config import FPS, FULLSCREEN, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE_FACTOR
+import time
 
 class Game:
     def __init__(self, homography):
