@@ -3,9 +3,8 @@ import mediapipe as mp
 import numpy as np
 import time
 import os
-from config import WALL_WIDTH, WALL_HEIGHT
+from config import WALL_WIDTH, WALL_HEIGHT, LANDMARKS_TO_TRACK, MAX_RECONNECT_ATTEMPTS, SCALE_FACTOR
 
-# MediaPipe 초기화
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 BaseOptions = mp.tasks.BaseOptions
@@ -13,11 +12,9 @@ PoseLandmarker = mp.tasks.vision.PoseLandmarker
 PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-
 class Camera:
     def __init__(self):
-        # 카메라 초기화
-        self.cap = cv2.VideoCapture(0)  # 노트북 웹캠
+        self.cap = cv2.VideoCapture(0)
         if not self.cap.isOpened():
             raise RuntimeError("Error: Cannot open webcam")
         ret, frame = self.cap.read()
@@ -28,17 +25,13 @@ class Camera:
             self.camera_width, self.camera_height = 1280, 720
             print("Warning: Using default camera resolution (1280x720)")
 
-        # PoseLandmarker 모델 경로 설정
         self.model_path = r"C:\Users\USER\PycharmProjects\BoulderPingPong\pose_landmarker_full.task"
-
-        # 모델 파일 존재 여부 확인
         if not os.path.exists(self.model_path):
             raise RuntimeError(
                 f"Error: Model file not found at {self.model_path}\n"
                 "Please download the model from: https://developers.google.com/mediapipe/solutions/vision/pose_landmarker#models"
             )
 
-        # PoseLandmarker 옵션 설정
         options = PoseLandmarkerOptions(
             base_options=BaseOptions(model_asset_path=self.model_path),
             running_mode=VisionRunningMode.VIDEO,
@@ -47,15 +40,11 @@ class Camera:
             min_pose_presence_confidence=0.5,
             min_tracking_confidence=0.5
         )
-
-        # PoseLandmarker 초기화
         self.landmarker = PoseLandmarker.create_from_options(options)
         self.reconnect_attempts = 0
-        self.max_reconnect_attempts = 5
+        self.max_reconnect_attempts = MAX_RECONNECT_ATTEMPTS
 
     def get_player_positions(self):
-        """손/발 위치 추출 (다중 사용자 지원)"""
-        # 카메라 연결 확인 및 재연결 시도
         if not self.cap.isOpened():
             print("Error: Camera disconnected, attempting to reconnect...")
             self.cap.release()
@@ -75,12 +64,10 @@ class Camera:
             print("Error: Failed to capture frame")
             return []
 
-        # 프레임 크기 확인
         if frame.shape[0] == 0 or frame.shape[1] == 0:
             print("Error: Invalid frame dimensions")
             return []
 
-        # 프레임을 RGB로 변환 및 MediaPipe 이미지 객체로 변환
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         try:
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
@@ -88,40 +75,31 @@ class Camera:
             print(f"Error creating mp.Image: {e}")
             return []
 
-        timestamp_ms = int(time.time() * 1000)  # 안정적인 타임스탬프
-
-        # 포즈 랜드마크 감지
+        timestamp_ms = int(time.time() * 1000)
         try:
             pose_landmarker_result = self.landmarker.detect_for_video(mp_image, timestamp_ms)
         except Exception as e:
             print(f"Error detecting landmarks: {e}")
             return []
 
-        # 다중 사용자 포즈 처리
         positions = []
         if pose_landmarker_result and pose_landmarker_result.pose_landmarks:
             print(f"Detected {len(pose_landmarker_result.pose_landmarks)} person(s)")
             for person_idx, pose_landmarks in enumerate(pose_landmarker_result.pose_landmarks):
-                person_positions = []
-                try:
-                    for idx, landmark in enumerate(pose_landmarks):
-                        if idx in [15, 16, 27, 28]:  # 왼손, 오른손, 왼발, 오른발
+                for idx, landmark in enumerate(pose_landmarks):
+                    if idx in LANDMARKS_TO_TRACK:
+                        try:
                             x = landmark.x * self.camera_width * (WALL_WIDTH / self.camera_width)
                             y = landmark.y * self.camera_height * (WALL_HEIGHT / self.camera_height)
-                            person_positions.append([x, y])
-                except AttributeError as e:
-                    print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")
-                    continue
-                if person_positions:
-                    positions.append(person_positions)
+                            positions.append([x, y])
+                        except AttributeError as e:
+                            print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")
         else:
             print("No landmarks detected in this frame")
 
         return positions
 
     def get_frame(self):
-        """카메라 프레임 반환 (캘리브레이션용)"""
-        # 카메라 연결 확인 및 재연결 시도
         if not self.cap.isOpened():
             print("Error: Camera disconnected, attempting to reconnect...")
             self.cap.release()
@@ -140,7 +118,6 @@ class Camera:
         return frame if ret else None
 
     def release(self):
-        """리소스 해제"""
         self.cap.release()
         self.landmarker.close()
         cv2.destroyAllWindows()
