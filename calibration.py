@@ -32,7 +32,6 @@ def calibrate_projector(camera, screen):
     print("카메라 창에서 다음 키를 눌러주세요:")
     print("'c' - 캘리브레이션 시도")
     print("'s' - 캘리브레이션 건너뛰기 (기본 호모그래피 사용)")
-    print("'p' - 카메라 화면 표시/숨김 토글")
     print("'ESC' - 프로그램 종료")
     print("=====================================")
 
@@ -41,7 +40,6 @@ def calibrate_projector(camera, screen):
     skipped = False
     max_attempts = 10
     attempt_count = 0
-    show_camera = False  # 카메라 화면 표시 여부
 
     while not captured and not skipped:
         # pygame 이벤트 처리
@@ -92,16 +90,10 @@ def calibrate_projector(camera, screen):
                     if attempt_count >= max_attempts:
                         print(f"최대 시도 횟수({max_attempts})에 도달했습니다.")
                         print("'s' 키를 눌러 건너뛰거나 'c' 키로 계속 시도하세요.")
-                elif event.key == pygame.K_p:
-                    show_camera = not show_camera
-                    print(f"카메라 화면 {'표시' if show_camera else '숨김'}")
-                    if not show_camera:
-                        cv2.destroyAllWindows()
 
-        # 카메라 프레임 표시 (토글 상태에 따라)
+        # 카메라 프레임 표시 (기본적으로 비활성화)
         frame = camera.get_frame()
-        if frame is not None and show_camera:
-            # 체스보드 검출 상태 표시
+        if frame is not None:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             ret, corners = cv2.findChessboardCorners(gray, CHESSBOARD_SIZE, None)
 
@@ -113,7 +105,7 @@ def calibrate_projector(camera, screen):
                 cv2.putText(frame, "Position camera to see chessboard",
                             (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            cv2.putText(frame, "c: Calibrate, s: Skip, p: Toggle Camera, ESC: Exit",
+            cv2.putText(frame, "c: Calibrate, s: Skip, ESC: Exit",
                         (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
             cv2.imshow("Calibration - Camera View", frame)
@@ -159,11 +151,6 @@ def calibrate_projector(camera, screen):
             print("캘리브레이션을 건너뛰고 기본 호모그래피를 사용합니다.")
             skipped = True
             break
-        elif key == ord('p'):
-            show_camera = not show_camera
-            print(f"카메라 화면 {'표시' if show_camera else '숨김'}")
-            if not show_camera:
-                cv2.destroyAllWindows()
         elif key == 27:  # ESC 키
             print("캘리브레이션을 취소합니다.")
             cv2.destroyAllWindows()

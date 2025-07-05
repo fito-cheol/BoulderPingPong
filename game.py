@@ -9,7 +9,7 @@ class Game:
     def __init__(self, camera, homography):
         self.camera = camera
         self.physics = Physics()
-        self.renderer = Renderer(homography)
+        self.renderer = Renderer(homography, camera)
         self.clock = pygame.time.Clock()
 
     def run(self):
@@ -51,6 +51,8 @@ class Game:
                     elif event.key == pygame.K_RIGHT:
                         config.FOCUS_X += FOCUS_ADJUST_STEP
                         print(f"화면 중심 X: {config.FOCUS_X:.1f}m")
+                    elif event.key == pygame.K_p:
+                        self.renderer.toggle_camera()
                 elif event.type == pygame.KEYUP:
                     self.renderer.update_key_state(event.key, False)
 

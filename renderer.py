@@ -5,12 +5,14 @@ from config import WALL_WIDTH, WALL_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RA
     COLORS, FOCUS_X, FOCUS_Y
 
 class Renderer:
-    def __init__(self, homography):
+    def __init__(self, homography, camera):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
         self.font = pygame.font.Font(None, int(36 * SCALE_FACTOR))
         self.homography = homography
         self.use_homography = homography is not None
+        self.camera = camera
+        self.show_camera = False
         self.key_states = {
             'w': False,
             's': False,
@@ -36,6 +38,11 @@ class Renderer:
         }
         if key in key_map:
             self.key_states[key_map[key]] = state
+
+    def toggle_camera(self):
+        """카메라 화면 표시 토글"""
+        self.show_camera = not self.show_camera
+        print(f"카메라 화면 {'표시' if self.show_camera else '숨김'}")
 
     def transform_coordinates(self, points):
         """호모그래피와 초점 오프셋을 사용해 좌표 변환"""
@@ -99,7 +106,22 @@ class Renderer:
         self.screen.blit(overlay, (0, 0))
 
     def render(self, ball_pos, player_positions, score):
-        self.screen.fill((0, 0, 0))
+        # 카메라 프레임 렌더링
+        if self.show_camera:
+            frame = self.camera.get_frame()
+            if frame is not None:
+                # OpenCV BGR을 RGB로 변환
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # 화면 크기에 맞게 리사이즈
+                frame_resized = cv2.resize(frame_rgb, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                # NumPy 배열을 Pygame Surface로 변환
+                frame_surface = pygame.surfarray.make_surface(frame_resized.swapaxes(0, 1))
+                self.screen.blit(frame_surface, (0, 0))
+            else:
+                self.screen.fill((0, 0, 0))  # 카메라 프레임 없으면 검은색 배경
+        else:
+            self.screen.fill((0, 0, 0))
+
         self.draw_borders_and_center_line()
 
         # 공 그리기
@@ -111,8 +133,6 @@ class Renderer:
                 x, y = int(ball_screen[0, 0]), int(ball_screen[0, 1])
                 if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
                     pygame.draw.circle(self.screen, COLORS['ball'], (x, y), ball_radius_pixel)
-                   ।
-
                     pygame.draw.circle(self.screen, COLORS['ball_border'], (x, y), ball_radius_pixel, border_thickness)
         except Exception as e:
             print(f"공 렌더링 오류: {e}")
