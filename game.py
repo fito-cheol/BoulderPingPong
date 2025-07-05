@@ -1,4 +1,5 @@
 import pygame
+import time
 from camera import Camera
 from physics import Physics
 from renderer import Renderer
