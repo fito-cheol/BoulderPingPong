@@ -12,15 +12,97 @@ PoseLandmarker = mp.tasks.vision.PoseLandmarker
 PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
+
+def find_available_cameras():
+    """사용 가능한 카메라 찾기"""
+    available_cameras = []
+
+    print("카메라 검색 중...")
+    for i in range(10):  # 0부터 9까지 카메라 인덱스 확인
+        cap = cv2.VideoCapture(i)
+        if cap.isOpened():
+            ret, frame = cap.read()
+            if ret and frame is not None:
+                # 카메라 정보 가져오기
+                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                fps = cap.get(cv2.CAP_PROP_FPS)
+
+                # 카메라 타입 추정
+                camera_type = "USB 카메라" if i > 0 else "내장 카메라"
+
+                available_cameras.append({
+                    'index': i,
+                    'type': camera_type,
+                    'resolution': f"{width}x{height}",
+                    'fps': fps
+                })
+
+                print(f"카메라 {i}: {camera_type} ({width}x{height}, {fps:.1f}fps)")
+            cap.release()
+        else:
+            # 카메라가 열리지 않으면 루프 종료
+            if i > 2:  # 처음 몇 개 인덱스는 확인
+                break
+
+    return available_cameras
+
+
+def select_camera():
+    """사용자가 카메라 선택"""
+    available_cameras = find_available_cameras()
+
+    if not available_cameras:
+        raise RuntimeError("사용 가능한 카메라가 없습니다.")
+
+    if len(available_cameras) == 1:
+        print(f"카메라 1개 발견: {available_cameras[0]['type']}")
+        return available_cameras[0]['index']
+
+    print("\n=== 카메라 선택 ===")
+    for i, cam in enumerate(available_cameras):
+        print(f"{i + 1}. {cam['type']} (인덱스: {cam['index']}) - {cam['resolution']}")
+
+    while True:
+        try:
+            choice = input(f"\n사용할 카메라를 선택하세요 (1-{len(available_cameras)}): ")
+            choice_idx = int(choice) - 1
+
+            if 0 <= choice_idx < len(available_cameras):
+                selected_camera = available_cameras[choice_idx]
+                print(f"\n선택된 카메라: {selected_camera['type']} (인덱스: {selected_camera['index']})")
+                return selected_camera['index']
+            else:
+                print("올바른 번호를 입력하세요.")
+        except ValueError:
+            print("숫자를 입력하세요.")
+        except KeyboardInterrupt:
+            print("\n프로그램을 종료합니다.")
+            exit()
+
+
 class Camera:
-    def __init__(self):
-        self.cap = cv2.VideoCapture(0)
+    def __init__(self, camera_index=None):
+        # 카메라 인덱스가 지정되지 않으면 자동 선택
+        if camera_index is None:
+            camera_index = select_camera()
+
+        self.camera_index = camera_index
+        self.cap = cv2.VideoCapture(camera_index)
+
         if not self.cap.isOpened():
-            raise RuntimeError("Error: Cannot open webcam")
+            raise RuntimeError(f"Error: Cannot open camera {camera_index}")
+
+        # 카메라 해상도 설정 시도
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
+
         ret, frame = self.cap.read()
         if ret:
             self.camera_width = frame.shape[1]
             self.camera_height = frame.shape[0]
+            print(f"카메라 해상도: {self.camera_width}x{self.camera_height}")
         else:
             self.camera_width, self.camera_height = 1280, 720
             print("Warning: Using default camera resolution (1280x720)")
@@ -44,20 +126,33 @@ class Camera:
         self.reconnect_attempts = 0
         self.max_reconnect_attempts = MAX_RECONNECT_ATTEMPTS
 
+    def reconnect_camera(self):
+        """카메라 재연결 시도"""
+        print(f"카메라 {self.camera_index} 재연결 시도 중...")
+        self.cap.release()
+        time.sleep(1)  # 잠깐 대기
+        self.cap = cv2.VideoCapture(self.camera_index)
+        self.reconnect_attempts += 1
+
+        if self.cap.isOpened():
+            # 카메라 설정 재적용
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            self.cap.set(cv2.CAP_PROP_FPS, 30)
+            print(f"카메라 {self.camera_index} 재연결 성공")
+            self.reconnect_attempts = 0
+            return True
+        else:
+            print(f"카메라 {self.camera_index} 재연결 실패")
+            return False
+
     def get_player_positions(self):
         if not self.cap.isOpened():
-            print("Error: Camera disconnected, attempting to reconnect...")
-            self.cap.release()
-            self.cap = cv2.VideoCapture(0)
-            self.reconnect_attempts += 1
-            if self.reconnect_attempts > self.max_reconnect_attempts:
-                print("Error: Max reconnect attempts reached.")
+            if not self.reconnect_camera():
+                if self.reconnect_attempts > self.max_reconnect_attempts:
+                    print("Error: Max reconnect attempts reached.")
+                    return []
                 return []
-            if not self.cap.isOpened():
-                print("Error: Reconnection failed. Retrying in 2 seconds...")
-                time.sleep(2)
-                return []
-            self.reconnect_attempts = 0
 
         ret, frame = self.cap.read()
         if not ret or frame is None:
@@ -101,18 +196,11 @@ class Camera:
 
     def get_frame(self):
         if not self.cap.isOpened():
-            print("Error: Camera disconnected, attempting to reconnect...")
-            self.cap.release()
-            self.cap = cv2.VideoCapture(0)
-            self.reconnect_attempts += 1
-            if self.reconnect_attempts > self.max_reconnect_attempts:
-                print("Error: Max reconnect attempts reached.")
+            if not self.reconnect_camera():
+                if self.reconnect_attempts > self.max_reconnect_attempts:
+                    print("Error: Max reconnect attempts reached.")
+                    return None
                 return None
-            if not self.cap.isOpened():
-                print("Error: Reconnection failed. Retrying in 2 seconds...")
-                time.sleep(2)
-                return None
-            self.reconnect_attempts = 0
 
         ret, frame = self.cap.read()
         return frame if ret else None
