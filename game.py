@@ -1,9 +1,9 @@
 import pygame
 import time
+import numpy as np
 from physics import Physics
 from renderer import Renderer
-from config import FPS, FULLSCREEN, SCREEN_WIDTH, SCREEN_HEIGHT, SCALE_FACTOR, WALL_WIDTH, WALL_HEIGHT, FOCUS_X, \
-    FOCUS_Y, WIDTH_ADJUST_STEP, HEIGHT_ADJUST_STEP, FOCUS_ADJUST_STEP
+from config import FPS, WIDTH_ADJUST_STEP, HEIGHT_ADJUST_STEP, FOCUS_ADJUST_STEP
 
 # 상수 정의
 MIN_WALL_SIZE = 0.1  # 최소 벽 크기 (미터)
