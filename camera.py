@@ -13,32 +13,47 @@ PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
 
+def get_camera_name_windows(index):
+    """Windows에서 카메라 이름을 가져오는 함수"""
+    try:
+        import subprocess
+        result = subprocess.run(['powershell', '-Command',
+                               'Get-WmiObject -Class Win32_PnPEntity | Where-Object {$_.Name -like "*camera*" -or $_.Name -like "*webcam*"} | Select-Object Name'],
+                               capture_output=True, text=True)
+        cameras = result.stdout.strip().split('\n')[2:]  # 헤더 제거
+        if index < len(cameras):
+            return cameras[index].strip()
+    except:
+        pass
+    return "알 수 없는 카메라"
+
 def find_available_cameras():
     """사용 가능한 카메라 찾기"""
     available_cameras = []
 
     print("카메라 검색 중...")
-    for i in range(10):  # 0부터 9까지 카메라 인덱스 확인
+    for i in range(10):
         cap = cv2.VideoCapture(i)
         if cap.isOpened():
             ret, frame = cap.read()
             if ret and frame is not None:
-                # 카메라 정보 가져오기
                 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 fps = cap.get(cv2.CAP_PROP_FPS)
 
-                # 카메라 타입 추정
+                # 카메라 이름 가져오기 (Windows용)
+                camera_name = get_camera_name_windows(i)
                 camera_type = "USB 카메라" if i > 0 else "내장 카메라"
 
                 available_cameras.append({
                     'index': i,
+                    'name': camera_name,
                     'type': camera_type,
                     'resolution': f"{width}x{height}",
                     'fps': fps
                 })
 
-                print(f"카메라 {i}: {camera_type} ({width}x{height}, {fps:.1f}fps)")
+                print(f"카메라 {i}: {camera_name} - {camera_type} ({width}x{height}, {fps:.1f}fps)")
             cap.release()
         else:
             # 카메라가 열리지 않으면 루프 종료
@@ -107,7 +122,7 @@ class Camera:
             self.camera_width, self.camera_height = 1280, 720
             print("Warning: Using default camera resolution (1280x720)")
 
-        self.model_path = r"pose_landmarker_full.task"
+        self.model_path = r"pose_landmarker_heavy.task"
         if not os.path.exists(self.model_path):
             raise RuntimeError(
                 f"Error: Model file not found at {self.model_path}\n"

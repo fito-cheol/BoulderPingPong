@@ -30,7 +30,7 @@
    pip install -r requirements.txt
    ```
 
-4. MediaPipe Pose Landmarker 모델(`pose_landmarker_full.task`)을 MediaPipe Pose Landmarker Models에서 다운로드하여 프로젝트 디렉토리에 배치합니다.
+4. MediaPipe Pose Landmarker 모델(`pose_landmarker_heavy.task`)을 MediaPipe Pose Landmarker Models에서 다운로드하여 프로젝트 디렉토리에 배치합니다.
 
 5. 게임을 실행합니다:
 
