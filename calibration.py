@@ -198,12 +198,30 @@ def calibrate_projector(camera, screen):
 
 def create_default_homography():
     """기본 호모그래피 매트릭스 생성 (단위 행렬 기반)"""
-    # 화면 전체를 벽 전체에 매핑하는 기본 변환
-    src_points = np.float32([[0, 0], [SCREEN_WIDTH, 0], [SCREEN_WIDTH, SCREEN_HEIGHT], [0, SCREEN_HEIGHT]])
-    dst_points = np.float32([[0, 0], [WALL_WIDTH, 0], [WALL_WIDTH, WALL_HEIGHT], [0, WALL_HEIGHT]])
+    # 실제 물리 좌표계 (미터 단위)에서 스크린 좌표계로의 변환
+    # 벽의 물리적 크기를 스크린 크기로 매핑
 
-    # 스케일 조정
-    dst_points = dst_points * np.array([SCREEN_WIDTH / WALL_WIDTH, SCREEN_HEIGHT / WALL_HEIGHT])
+    # 소스 점들: 벽의 물리적 좌표 (미터 단위)
+    src_points = np.float32([
+        [0, 0],  # 왼쪽 위
+        [WALL_WIDTH, 0],  # 오른쪽 위
+        [WALL_WIDTH, WALL_HEIGHT],  # 오른쪽 아래
+        [0, WALL_HEIGHT]  # 왼쪽 아래
+    ])
 
-    homography = cv2.getPerspectiveTransform(src_points, dst_points)
-    return homography
+    # 대상 점들: 스크린 좌표 (픽셀 단위)
+    dst_points = np.float32([
+        [0, 0],  # 왼쪽 위
+        [SCREEN_WIDTH, 0],  # 오른쪽 위
+        [SCREEN_WIDTH, SCREEN_HEIGHT],  # 오른쪽 아래
+        [0, SCREEN_HEIGHT]  # 왼쪽 아래
+    ])
+
+    try:
+        homography = cv2.getPerspectiveTransform(src_points, dst_points)
+        print("기본 호모그래피 매트릭스 생성 완료")
+        return homography
+    except Exception as e:
+        print(f"기본 호모그래피 생성 실패: {e}")
+        # 단위 행렬로 대체
+        return np.eye(3, dtype=np.float32)
