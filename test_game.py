@@ -399,10 +399,8 @@ def main(MAX_RECONNECT_ATTEMPTS=10):
 
                 # 랜드마크 처리
                 if result.pose_landmarks:
-                    print(f"Detected {len(result.pose_landmarks)} person(s)")
                     frame_bgr, _, player_positions = process_landmarks(frame_bgr, result.pose_landmarks, config, physics)
                 else:
-                    print("No landmarks detected")
                     player_positions = []
                     if not physics.round_ended:
                         draw_ball(frame_bgr, physics.ball_pos, config)

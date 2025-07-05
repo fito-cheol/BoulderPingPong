@@ -160,10 +160,7 @@ def main():
 
                 frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
                 if result.pose_landmarks:
-                    print(f"Detected {len(result.pose_landmarks)} person(s)")
                     frame_bgr, _ = process_landmarks(frame_bgr, result.pose_landmarks, config)
-                else:
-                    print("No landmarks detected")
 
                 cv2.imshow("Hand/Foot Tracking", frame_bgr)
                 if cv2.waitKey(1) & 0xFF == 27:

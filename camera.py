@@ -194,7 +194,6 @@ class Camera:
 
         positions = []
         if pose_landmarker_result and pose_landmarker_result.pose_landmarks:
-            print(f"Detected {len(pose_landmarker_result.pose_landmarks)} person(s)")
             for person_idx, pose_landmarks in enumerate(pose_landmarker_result.pose_landmarks):
                 for idx, landmark in enumerate(pose_landmarks):
                     if idx in LANDMARKS_TO_TRACK:
@@ -204,8 +203,6 @@ class Camera:
                             positions.append([x, y])
                         except AttributeError as e:
                             print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")
-        else:
-            print("No landmarks detected in this frame")
 
         return positions
 
