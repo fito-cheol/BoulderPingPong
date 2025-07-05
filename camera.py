@@ -61,7 +61,7 @@ def select_camera():
 
     print("\n=== 카메라 선택 ===")
     for i, cam in enumerate(available_cameras):
-        print(f"{i + 1}. {cam['type']} (인덱스: {cam['index']}) - {cam['resolution']}")
+        print(f"{i + 1}. {cam['type']} - {cam['resolution']}")
 
     while True:
         try:

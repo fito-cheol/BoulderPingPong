@@ -6,7 +6,6 @@ from config import SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN
 
 
 def main():
-    print("=== 멀티카메라 지원 축구 게임 ===")
     print("시작하기 전에 카메라를 선택하세요.\n")
 
     try:
@@ -34,7 +33,8 @@ def main():
         print("- ESC: 게임 종료")
         print("================")
 
-        game = Game(homography)
+        # 수정된 부분: camera와 homography 모두 전달
+        game = Game(camera, homography)
         game.run()
 
     except RuntimeError as e:
