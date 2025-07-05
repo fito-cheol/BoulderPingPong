@@ -1,11 +1,11 @@
 import numpy as np
 import random
 from config import WALL_WIDTH, WALL_HEIGHT, BALL_RADIUS, HITBOX_RADIUS, INITIAL_BALL_SPEED_SCALE, BALL_SPEED_SCALE, ROUND_END_DELAY
+import time
 
 class Physics:
     def __init__(self):
-        self.ball_pos = np.array([WALL_WIDTH / 2, WALL_HEIGHT / 2], dtype=float)
-        self.ball_vel = np.array([random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE, random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE, 0.5 * INITIAL_BALL_SPEED_SCALE)], dtype=float)
+        self.reset_ball()
         self.score = [0, 0]
         self.ignore_collisions = False
         self.target_side = None
@@ -57,10 +57,17 @@ class Physics:
 
     def reset_ball(self):
         """공을 중앙으로 리셋"""
-        self.ball_pos = np.array([WALL_WIDTH / 2, WALL_HEIGHT / 2])
+        self.ball_pos = np.array([WALL_WIDTH / 2, WALL_HEIGHT / 2], dtype=float)
         self.ball_vel = np.array([
             random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE,
             random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE, 0.5 * INITIAL_BALL_SPEED_SCALE)
-        ])
+        ], dtype=float)
         self.ignore_collisions = False
         self.target_side = None
+
+    def reset_game(self):
+        """게임 전체를 재시작"""
+        self.score = [0, 0]
+        self.reset_ball()
+        self.round_ended = False
+        self.round_end_time = None

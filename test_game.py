@@ -315,7 +315,7 @@ class CustomPhysics(Physics):
 
 
 def main(MAX_RECONNECT_ATTEMPTS=10):
-    model_path = r"C:\Users\USER\PycharmProjects\BoulderPingPong\pose_landmarker_full.task"
+    model_path = r"pose_landmarker_full.task"
     try:
         config = initialize_camera()
         landmarker = setup_pose_landmarker(model_path)

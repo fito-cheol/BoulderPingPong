@@ -25,7 +25,7 @@ class Camera:
             self.camera_width, self.camera_height = 1280, 720
             print("Warning: Using default camera resolution (1280x720)")
 
-        self.model_path = r"C:\Users\USER\PycharmProjects\BoulderPingPong\pose_landmarker_full.task"
+        self.model_path = r"pose_landmarker_full.task"
         if not os.path.exists(self.model_path):
             raise RuntimeError(
                 f"Error: Model file not found at {self.model_path}\n"

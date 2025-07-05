@@ -126,7 +126,7 @@ def process_landmarks(frame: np.ndarray, landmarks: list, config: CameraConfig) 
 
 
 def main():
-    model_path = r"C:\Users\USER\PycharmProjects\BoulderPingPong\pose_landmarker_full.task"
+    model_path = r"pose_landmarker_full.task"
 
     try:
         config = initialize_camera()
