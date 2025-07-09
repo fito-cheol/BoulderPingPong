@@ -1,0 +1,18 @@
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.csproj.AssemblyReference.cache
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.AssemblyInfoInputs.cache
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.AssemblyInfo.cs
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.csproj.CoreCompileInputs.cache
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.sourcelink.json
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\bin\Debug\Boulder Ping Pong.deps.json
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\bin\Debug\Boulder Ping Pong.runtimeconfig.json
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\bin\Debug\Boulder Ping Pong.dll
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\bin\Debug\Boulder Ping Pong.pdb
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\bin\Debug\GodotSharp.dll
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\bin\Debug\GodotSharpEditor.dll
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder .E1E92C12.Up2Date
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.dll
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\refint\Boulder Ping Pong.dll
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.pdb
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\Boulder Ping Pong.genruntimeconfig.cache
+C:\Users\TypingCat\Documents\Work\DA\PersonalProjects\Pingpong\BoulderPingPong\godot_project\.godot\mono\temp\obj\Debug\ref\Boulder Ping Pong.dll

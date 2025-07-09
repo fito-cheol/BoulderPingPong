@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "nmVOoFLD4cM=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\TypingCat\\Documents\\Work\\DA\\PersonalProjects\\Pingpong\\BoulderPingPong\\godot_project\\Boulder Ping Pong.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\TypingCat\\.nuget\\packages\\godot.sourcegenerators\\4.4.1\\godot.sourcegenerators.4.4.1.nupkg.sha512",
+    "C:\\Users\\TypingCat\\.nuget\\packages\\godotsharp\\4.4.1\\godotsharp.4.4.1.nupkg.sha512",
+    "C:\\Users\\TypingCat\\.nuget\\packages\\godotsharpeditor\\4.4.1\\godotsharpeditor.4.4.1.nupkg.sha512",
+    "C:\\Users\\TypingCat\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.16\\microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
+    "C:\\Users\\TypingCat\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.16\\microsoft.windowsdesktop.app.ref.8.0.16.nupkg.sha512",
+    "C:\\Users\\TypingCat\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.16\\microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512"
+  ],
+  "logs": []
+}

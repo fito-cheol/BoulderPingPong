@@ -1,0 +1,16 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1751787768
+icon.svg::CompressedTexture2D/CompressedTexture2D::1535148151330510853::1751725042::1751735198::1::::<><><>0<>0<>ca0c6fe883a4f737c023aa616e5e468b<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
+README.md::TextFile/TextFile::-1::1751720688::0::1::::<><><>0<>0<><>::
+::res://Resources/::1751736156
+::res://Resources/Graphics/::1751736548
+ball.png::CompressedTexture2D/CompressedTexture2D::148331927732832874::1751736144::1751736157::1::::<><><>0<>0<>a555bde29db0a3672a2de453094f7d37<>res://.godot/imported/ball.png-6f2ea9e44c9222980bd53164eb2a03a3.ctex::
+GreenBat.png::CompressedTexture2D/CompressedTexture2D::1082754106328520919::1751736450::1751736450::1::::<><><>0<>0<>d7d089d9336c1724fa44cbd8ea87549b<>res://.godot/imported/GreenBat.png-950cdd67413391624015034746cd2855.ctex::
+NormalBat.png::CompressedTexture2D/CompressedTexture2D::2145189773866728614::1751736548::1751736548::1::::<><><>0<>0<>231a600871f3a7dd7eaf6136934e8041<>res://.godot/imported/NormalBat.png-646f5adaf612fa9110f76ccee8afb1a2.ctex::
+::res://scenes/::1751738453
+Main.tscn::PackedScene::3558211304312886467::1751738453::0::1::::<><><>0<>0<><>::uid://d3n4e5ttqaq63::::res://scripts/GameManager.cs<>uid://df5sta8c6dwif::::res://scripts/PoseDataReceiver.cs<>uid://dd2biychdp2li::::res://scripts/Signals.cs<>uid://cd4af8r2o2dy::::res://Resources/Graphics/ball.png<>uid://poq2jbn14bv8::::res://Resources/Graphics/GreenBat.png<>uid://5te7yiyj7vys::::res://Resources/Graphics/NormalBat.png<>uid://v4vwvvhaumen::::res://icon.svg<>uid://dv2hyn3ex88jo::::res://scripts/HttpDebugLabel.cs
+::res://scripts/::1751738027
+GameManager.cs::CSharpScript::9153156125649296282::1751735336::0::1::::<>Node<><>0<>0<><>::
+HttpDebugLabel.cs::CSharpScript::8689434571112568380::1751738114::0::1::::<>Node<><>0<>0<><>::
+PoseDataReceiver.cs::CSharpScript::7573264488956234357::1751738444::0::1::::<>Node<><>0<>0<><>::
+Signals.cs::CSharpScript::7425643048669710322::1751734905::0::1::::<>Node<><>0<>0<><>::

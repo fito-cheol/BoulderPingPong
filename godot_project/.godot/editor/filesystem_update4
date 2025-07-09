@@ -1,0 +1,5 @@
+res://scenes/Main.tscn
+res://scripts/GameManager.cs
+res://scripts/Signals.cs
+res://scripts/HttpDebugLabel.cs
+res://scripts/PoseDataReceiver.cs

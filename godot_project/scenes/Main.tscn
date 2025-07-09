@@ -1,0 +1,252 @@
+[gd_scene load_steps=13 format=3 uid="uid://bqxvhqxqxqxqx"]
+
+[ext_resource type="Script" uid="uid://d3n4e5ttqaq63" path="res://scripts/GameManager.cs" id="1_0"]
+[ext_resource type="Script" uid="uid://df5sta8c6dwif" path="res://scripts/PoseDataReceiver.cs" id="2_0"]
+[ext_resource type="Script" uid="uid://dd2biychdp2li" path="res://scripts/Signals.cs" id="2_0bbpv"]
+[ext_resource type="Texture2D" uid="uid://cd4af8r2o2dy" path="res://Resources/Graphics/ball.png" id="4_rarhs"]
+[ext_resource type="Texture2D" uid="uid://poq2jbn14bv8" path="res://Resources/Graphics/GreenBat.png" id="5_c01mt"]
+[ext_resource type="Texture2D" uid="uid://5te7yiyj7vys" path="res://Resources/Graphics/NormalBat.png" id="6_nxtc6"]
+[ext_resource type="Texture2D" uid="uid://v4vwvvhaumen" path="res://icon.svg" id="7_jlsqs"]
+[ext_resource type="Script" uid="uid://dv2hyn3ex88jo" path="res://scripts/HttpDebugLabel.cs" id="8_q8u5g"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 30.0
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_jlsqs"]
+size = Vector2(25, 25)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(20, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(20, 100)
+
+[node name="Main" type="Node2D"]
+
+[node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("PoseReceiver", "Ball", "PlayerPaddle1", "PlayerPaddle2", "PlayerPaddle3", "PlayerPaddle4", "AIPaddle", "ScoreLabel", "StatusLabel", "DebugLabel")]
+script = ExtResource("1_0")
+PoseReceiver = NodePath("../PoseDataReceiver")
+Ball = NodePath("../Ball")
+PlayerPaddle1 = NodePath("../PlayerPaddle1")
+PlayerPaddle2 = NodePath("../PlayerPaddle2")
+PlayerPaddle3 = NodePath("../PlayerPaddle3")
+PlayerPaddle4 = NodePath("../PlayerPaddle4")
+AIPaddle = NodePath("../AIPaddle")
+ScoreLabel = NodePath("../UI/ScoreLabel")
+StatusLabel = NodePath("../UI/StatusLabel")
+DebugLabel = NodePath("../UI/DebugLabel")
+
+[node name="Signals" type="Node" parent="."]
+script = ExtResource("2_0bbpv")
+
+[node name="PoseDataReceiver" type="Node" parent="." node_paths=PackedStringArray("DebugJsonLabel", "DebugWSStatusLabel")]
+script = ExtResource("2_0")
+DebugJsonLabel = NodePath("../UI/DebugJsonLabel")
+DebugWSStatusLabel = NodePath("../UI/DebugWSStatusLabel")
+
+[node name="DebugJsonLabel" type="Label" parent="PoseDataReceiver"]
+offset_right = 753.0
+offset_bottom = 433.0
+vertical_alignment = 2
+
+[node name="Ball" type="StaticBody2D" parent="."]
+position = Vector2(960, 540)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ball"]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="Ball"]
+scale = Vector2(0.625001, 0.625001)
+texture = ExtResource("4_rarhs")
+
+[node name="DebugPlayerSprite2" type="Sprite2D" parent="."]
+position = Vector2(200, 1080)
+texture = SubResource("PlaceholderTexture2D_jlsqs")
+
+[node name="DebugPlayerSprite" type="Sprite2D" parent="."]
+position = Vector2(100, 540)
+texture = SubResource("PlaceholderTexture2D_jlsqs")
+
+[node name="PlayerPaddle1" type="StaticBody2D" parent="."]
+position = Vector2(100, 540)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerPaddle1"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerPaddle1"]
+modulate = Color(0, 1, 0, 1)
+position = Vector2(-3, 6.00002)
+rotation = -0.785398
+scale = Vector2(0.163194, 0.163194)
+texture = ExtResource("5_c01mt")
+
+[node name="PlayerPaddle2" type="StaticBody2D" parent="."]
+position = Vector2(1820, 540)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerPaddle2"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerPaddle2"]
+modulate = Color(0, 0, 1, 1)
+position = Vector2(-3, 6.00002)
+rotation = -0.785398
+scale = Vector2(0.163194, 0.163194)
+texture = ExtResource("5_c01mt")
+
+[node name="PlayerPaddle3" type="StaticBody2D" parent="."]
+position = Vector2(960, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerPaddle3"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerPaddle3"]
+modulate = Color(1, 1, 0, 1)
+position = Vector2(-3, 6.00002)
+rotation = -0.785398
+scale = Vector2(0.163194, 0.163194)
+texture = ExtResource("5_c01mt")
+
+[node name="PlayerPaddle4" type="StaticBody2D" parent="."]
+position = Vector2(960, 980)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerPaddle4"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Sprite2D" type="Sprite2D" parent="PlayerPaddle4"]
+modulate = Color(1, 0, 1, 1)
+position = Vector2(-3, 6.00002)
+rotation = -0.785398
+scale = Vector2(0.163194, 0.163194)
+texture = ExtResource("5_c01mt")
+
+[node name="AIPaddle" type="StaticBody2D" parent="."]
+position = Vector2(1820, 540)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AIPaddle"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="Sprite2D" type="Sprite2D" parent="AIPaddle"]
+modulate = Color(1, 0, 0, 1)
+position = Vector2(-1.99995, 3)
+rotation = -0.802851
+scale = Vector2(0.163, 0.163)
+texture = ExtResource("6_nxtc6")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="UI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 60.0
+text = "플레이어: 0  |  AI: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -150.0
+offset_top = 80.0
+offset_right = 150.0
+offset_bottom = 120.0
+text = "서버에 연결 중..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Instructions" type="Label" parent="UI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -100.0
+offset_right = -20.0
+offset_bottom = -20.0
+text = "조작법:
+Enter: 게임 재시작
+ESC: 게임 종료"
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="DebugLabel" type="Label" parent="UI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -120.0
+offset_right = -20.0
+offset_bottom = -20.0
+vertical_alignment = 2
+
+[node name="DebugWSStatusLabel" type="Label" parent="UI"]
+offset_left = 1059.0
+offset_top = 493.0
+offset_right = 1812.0
+offset_bottom = 926.0
+vertical_alignment = 2
+
+[node name="DebugJsonLabel" type="Label" parent="UI"]
+offset_left = 31.0
+offset_top = 459.0
+offset_right = 784.0
+offset_bottom = 892.0
+vertical_alignment = 2
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="CenterLine" type="Line2D" parent="."]
+position = Vector2(960, 0)
+points = PackedVector2Array(0, 0, 0, 1080)
+width = 2.0
+default_color = Color(1, 1, 1, 0.5)
+
+[node name="SendHttpButton" type="Button" parent="."]
+offset_left = -1.0
+offset_top = 241.0
+offset_right = 135.0
+offset_bottom = 377.0
+icon = ExtResource("7_jlsqs")
+
+[node name="HttpDebugTester" type="Node" parent="." node_paths=PackedStringArray("debugLabel1", "debugLabel2", "RequestButton")]
+script = ExtResource("8_q8u5g")
+debugLabel1 = NodePath("PanelContainer/HBoxContainer/HttpDebugLabel1")
+debugLabel2 = NodePath("PanelContainer/HBoxContainer/HttpDebugLabel2")
+RequestButton = NodePath("../SendHttpButton")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="HttpDebugTester"]
+
+[node name="HTTPRequest2" type="HTTPRequest" parent="HttpDebugTester"]
+
+[node name="PanelContainer" type="PanelContainer" parent="HttpDebugTester"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 126.0
+offset_bottom = 238.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HttpDebugTester/PanelContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="HttpDebugLabel1" type="RichTextLabel" parent="HttpDebugTester/PanelContainer/HBoxContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+text = "asdfsafasdfasf"
+
+[node name="HttpDebugLabel2" type="RichTextLabel" parent="HttpDebugTester/PanelContainer/HBoxContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+text = "fasdfas"
+
+[connection signal="pressed" from="SendHttpButton" to="HttpDebugTester" method="_on_send_http_button_pressed"]

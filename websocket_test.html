@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Pose Data Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .connecting { background-color: #fff3cd; color: #856404; }
+        
+        .data-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        
+        .data-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .data-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Pose Data Test</h1>
+        
+        <div id="status" class="status disconnected">연결되지 않음</div>
+        
+        <div>
+            <button id="connectBtn" onclick="connect()">연결</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>연결 해제</button>
+            <button onclick="clearLog()">로그 지우기</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="messageCount">0</div>
+                <div class="stat-label">수신 메시지</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="playerCount">0</div>
+                <div class="stat-label">감지된 플레이어</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="handCount">0</div>
+                <div class="stat-label">손 데이터</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="lastUpdate">-</div>
+                <div class="stat-label">마지막 업데이트</div>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="data-title">최신 포즈 데이터:</div>
+            <div id="poseData" class="data-content">데이터 없음</div>
+        </div>
+        
+        <div class="data-section">
+            <div class="data-title">연결 로그:</div>
+            <div id="log" class="data-content"></div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let messageCount = 0;
+        let lastUpdateTime = null;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function updateStatus(status, className) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = status;
+            statusDiv.className = `status ${className}`;
+        }
+        
+        function updateStats() {
+            document.getElementById('messageCount').textContent = messageCount;
+            if (lastUpdateTime) {
+                const seconds = Math.floor((Date.now() - lastUpdateTime) / 1000);
+                document.getElementById('lastUpdate').textContent = `${seconds}s 전`;
+            }
+        }
+        
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                log('이미 연결되어 있습니다.');
+                return;
+            }
+            
+            updateStatus('연결 중...', 'connecting');
+            log('WebSocket 연결 시도 중...');
+            
+            ws = new WebSocket('ws://localhost:8080');
+            
+            ws.onopen = function(event) {
+                updateStatus('연결됨', 'connected');
+                log('WebSocket 연결 성공!');
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+            };
+            
+            ws.onmessage = function(event) {
+                messageCount++;
+                lastUpdateTime = Date.now();
+                
+                try {
+                    const data = JSON.parse(event.data);
+                    log(`메시지 수신 (${messageCount}): ${event.data.length} 바이트`);
+                    
+                    // 통계 업데이트
+                    let playerCount = 0;
+                    let handCount = 0;
+                    
+                    if (data.players && Array.isArray(data.players)) {
+                        playerCount = data.players.length;
+                        
+                        if (data.players.length > 0 && data.players[0].hands) {
+                            handCount = data.players[0].hands.length;
+                        }
+                    }
+                    
+                    document.getElementById('playerCount').textContent = playerCount;
+                    document.getElementById('handCount').textContent = handCount;
+                    
+                    // 포즈 데이터 표시
+                    document.getElementById('poseData').textContent = JSON.stringify(data, null, 2);
+                    
+                } catch (e) {
+                    log(`JSON 파싱 오류: ${e.message}`);
+                    log(`원본 데이터: ${event.data}`);
+                }
+                
+                updateStats();
+            };
+            
+            ws.onclose = function(event) {
+                updateStatus('연결 해제됨', 'disconnected');
+                log(`WebSocket 연결 해제: ${event.code} - ${event.reason}`);
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+            };
+            
+            ws.onerror = function(error) {
+                updateStatus('연결 오류', 'disconnected');
+                log(`WebSocket 오류: ${error}`);
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+            };
+        }
+        
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+        
+        // 페이지 로드 시 자동 연결
+        window.onload = function() {
+            log('페이지 로드됨');
+            // 자동 연결은 주석 처리 (수동 연결 권장)
+            // setTimeout(connect, 1000);
+        };
+        
+        // 통계 업데이트 타이머
+        setInterval(updateStats, 1000);
+    </script>
+</body>
+</html> 
