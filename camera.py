@@ -25,7 +25,7 @@ def get_camera_name_windows(index):
             return cameras[index].strip()
     except:
         pass
-    return "알 수 없는 카메라"
+    return None
 
 def find_available_cameras():
     """사용 가능한 카메라 찾기 (개선된 버전)"""
@@ -34,57 +34,19 @@ def find_available_cameras():
     print("카메라 검색 중...")
     
     # 더 안전한 검색 범위 설정
-    max_camera_index = 5  # 일반적으로 5개 정도면 충분
+    max_camera_index = 4  # 일반적으로 4개 정도면 충분
     
     for i in range(max_camera_index):
         try:
-            # OpenCV 경고 메시지 억제
-            import warnings
-            warnings.filterwarnings("ignore", category=UserWarning)
-            
-            cap = cv2.VideoCapture(i, cv2.CAP_ANY)
-            if cap.isOpened():
-                # 타임아웃 설정으로 빠른 검색
-                cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 500)  # 0.5초 타임아웃
-                cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 500)  # 0.5초 타임아웃
-                
-                # 프레임 읽기 시도 (더 안전한 방법)
-                try:
-                    ret, frame = cap.read()
-                    if ret and frame is not None and frame.size > 0:
-                        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        fps = cap.get(cv2.CAP_PROP_FPS)
+            # 카메라 이름 가져오기 (Windows용)
+            camera_name = get_camera_name_windows(i)
+            if camera_name is None:
+                break;
 
-                        # 카메라 이름 가져오기 (Windows용)
-                        camera_name = get_camera_name_windows(i)
-                        
-                        # 가상 카메라 필터링
-                        if is_virtual_camera(camera_name):
-                            print(f"가상 카메라 제외: {camera_name}")
-                            cap.release()
-                            continue
-                        
-                        camera_type = "USB 카메라" if i > 0 else "내장 카메라"
-
-                        available_cameras.append({
-                            'index': i,
-                            'name': camera_name,
-                            'type': camera_type,
-                            'resolution': f"{width}x{height}",
-                            'fps': fps
-                        })
-
-                        print(f"카메라 {i}: {camera_name} - {camera_type} ({width}x{height}, {fps:.1f}fps)")
-                except Exception as frame_error:
-                    print(f"카메라 {i} 프레임 읽기 실패: {frame_error}")
-                    pass
-                
-                cap.release()
-            else:
-                # 연속으로 2개 이상 실패하면 중단 (더 빠른 종료)
-                if i > 1 and len(available_cameras) == 0:
-                    break
+            available_cameras.append({
+                'index': i,
+                'name': camera_name,
+            })
         except Exception as e:
             print(f"카메라 {i} 검색 중 오류: {e}")
             continue
@@ -118,12 +80,11 @@ def select_camera():
         raise RuntimeError("사용 가능한 카메라가 없습니다.")
 
     if len(available_cameras) == 1:
-        print(f"카메라 1개 발견: {available_cameras[0]['type']}")
         return available_cameras[0]['index']
 
     print("\n=== 카메라 선택 ===")
     for i, cam in enumerate(available_cameras):
-        print(f"{i + 1}. {cam['type']} - {cam['resolution']}")
+        print(f"{cam['index'] + 1}. {cam['name']} ")
 
     while True:
         try:
@@ -132,7 +93,7 @@ def select_camera():
 
             if 0 <= choice_idx < len(available_cameras):
                 selected_camera = available_cameras[choice_idx]
-                print(f"\n선택된 카메라: {selected_camera['type']} (인덱스: {selected_camera['index']})")
+                print(f"\n선택된 카메라: (인덱스: {selected_camera['index']})")
                 return selected_camera['index']
             else:
                 print("올바른 번호를 입력하세요.")
