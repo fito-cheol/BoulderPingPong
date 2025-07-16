@@ -2,8 +2,12 @@ import pygame
 import numpy as np
 import cv2
 from typing import Tuple, List, Union
-from config import WALL_WIDTH, WALL_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RADIUS, HITBOX_RADIUS, SCALE_FACTOR, \
-    COLORS, FOCUS_X, FOCUS_Y
+# 변경되는 변수는 직접 import config.WALL_WIDTH, config.WALL_HEIGHT, config.FOCUS_X, config.FOCUS_Y
+import config
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RADIUS, HITBOX_RADIUS, SCALE_FACTOR, \
+    COLORS
+
+
 
 # 상수 정의
 BORDER_THICKNESS = int(10 * SCALE_FACTOR)  # 테두리 두께
@@ -60,7 +64,7 @@ class Renderer:
         #     if points.shape[1] != 2:
         #         points = points.reshape(1, 2)
         #
-        #     points = points - np.array([FOCUS_X, FOCUS_Y])
+        #     points = points - np.array([config.FOCUS_X, config.FOCUS_Y])
         #     points_homogeneous = np.column_stack([points, np.ones(points.shape[0])])
         #     transformed_homogeneous = self.homography @ points_homogeneous.T2
         #     transformed = transformed_homogeneous[:2] / transformed_homogeneous[2]
@@ -75,7 +79,7 @@ class Renderer:
         points = np.array(points, dtype=np.float32)
         if points.ndim == 1:
             points = points.reshape(1, -1)
-        points = points - np.array([FOCUS_X, FOCUS_Y])
+        points = points - np.array([config.FOCUS_X, config.FOCUS_Y])
         scale_x = SCREEN_WIDTH
         scale_y = SCREEN_HEIGHT
         return points * np.array([scale_x, scale_y])
@@ -105,13 +109,14 @@ class Renderer:
     def render(self, ball_pos: List[float], player_positions: List[List[float]], score: Tuple[int, int]) -> None:
         """게임 화면 렌더링: 배경, 테두리, 공, 플레이어, 점수, 키 상태"""
         # 카메라 프레임 렌더링
+        print(config.WALL_WIDTH, config.WALL_HEIGHT)
         if self.show_camera:
             frame = self.camera.get_frame()
             if frame is not None:
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_resized = cv2.resize(frame_rgb, (WALL_WIDTH, WALL_HEIGHT))
+                frame_resized = cv2.resize(frame_rgb, (config.WALL_WIDTH, config.WALL_HEIGHT))
                 frame_surface = pygame.surfarray.make_surface(frame_resized.swapaxes(0, 1))
-                self.screen.blit(frame_surface, (FOCUS_X, FOCUS_Y))
+                self.screen.blit(frame_surface, (config.FOCUS_X, config.FOCUS_Y))
             else:
                 self.screen.fill((0, 0, 0))
         else:

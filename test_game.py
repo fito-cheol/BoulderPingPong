@@ -7,7 +7,8 @@ import random
 import pyautogui
 from dataclasses import dataclass
 from physics import Physics
-from config import WALL_WIDTH, WALL_HEIGHT, BALL_RADIUS, HITBOX_RADIUS, FPS
+import config
+from config import BALL_RADIUS, HITBOX_RADIUS, FPS
 
 # Constants
 SHOW_CAMERA_FEED = False
@@ -84,7 +85,7 @@ def transform_coordinates(points, config: CameraConfig):
     points = np.array(points, dtype=np.float32)
     if points.ndim == 1:
         points = points.reshape(1, -1, 2)
-    scale = np.array([config.screen_width / WALL_WIDTH, config.screen_height / WALL_HEIGHT])
+    scale = np.array([config.screen_width / config.WALL_WIDTH, config.screen_height / config.WALL_HEIGHT])
     transformed = points * scale
     return transformed.reshape(-1, 2)
 
@@ -107,7 +108,7 @@ def draw_landmark(frame: np.ndarray, landmark, idx: int, config: CameraConfig) -
 def draw_ball(frame: np.ndarray, ball_pos: np.ndarray, config: CameraConfig) -> None:
     """Draw ball with border on frame."""
     ball_screen = transform_coordinates(ball_pos, config)
-    ball_radius_pixel = int(BALL_RADIUS * config.screen_width / WALL_WIDTH)
+    ball_radius_pixel = int(BALL_RADIUS * config.screen_width / config.WALL_WIDTH)
     border_thickness = max(1, int(ball_radius_pixel * 0.1))
     cv2.circle(frame, (int(ball_screen[0, 0]), int(ball_screen[0, 1])), ball_radius_pixel, COLORS['ball'], -1)
     cv2.circle(frame, (int(ball_screen[0, 0]), int(ball_screen[0, 1])), ball_radius_pixel, COLORS['ball_border'], border_thickness)
@@ -177,8 +178,8 @@ def process_landmarks(frame: np.ndarray, landmarks: list, config: CameraConfig, 
         for idx, landmark in enumerate(pose_landmarks):
             if idx in LANDMARKS_TO_TRACK:
                 try:
-                    x_m = landmark.x * config.width * (WALL_WIDTH / config.width)
-                    y_m = landmark.y * config.height * (WALL_HEIGHT / config.height)
+                    x_m = landmark.x * config.width * (config.WALL_WIDTH / config.width)
+                    y_m = landmark.y * config.height * (config.WALL_HEIGHT / config.height)
                     person_positions.append([x_m, y_m])
                     draw_landmark(frame, landmark, idx, config)
                     if 디버깅:
@@ -228,8 +229,8 @@ def draw_landmarks(frame: np.ndarray, landmarks: list, config: CameraConfig) -> 
         for idx, landmark in enumerate(pose_landmarks):
             if idx in LANDMARKS_TO_TRACK:
                 try:
-                    x_m = landmark.x * config.width * (WALL_WIDTH / config.width)
-                    y_m = landmark.y * config.height * (WALL_HEIGHT / config.height)
+                    x_m = landmark.x * config.width * (config.WALL_WIDTH / config.width)
+                    y_m = landmark.y * config.height * (config.WALL_HEIGHT / config.height)
                     person_positions.append([x_m, y_m])
                     draw_landmark(frame, landmark, idx, config)
                     if 디버깅:
@@ -275,7 +276,7 @@ class CustomPhysics(Physics):
                 if self.check_collision(self.ball_pos, pos, BALL_RADIUS, HITBOX_RADIUS):
                     self.ignore_collisions = True
                     # Move ball to opposite side with full speed
-                    self.target_side = 'left' if self.ball_pos[0] > WALL_WIDTH / 2 else 'right'
+                    self.target_side = 'left' if self.ball_pos[0] > config.WALL_WIDTH / 2 else 'right'
                     self.ball_vel = np.array([
                         -BALL_SPEED_SCALE if self.target_side == 'left' else BALL_SPEED_SCALE,
                         random.uniform(-0.5 * BALL_SPEED_SCALE, 0.5 * BALL_SPEED_SCALE)
@@ -289,23 +290,23 @@ class CustomPhysics(Physics):
             self.score[1] += 1  # Right player scores
             self.round_ended = True
             self.round_end_time = time.time()
-        elif self.ball_pos[0] > WALL_WIDTH:
+        elif self.ball_pos[0] > config.WALL_WIDTH:
             self.score[0] += 1  # Left player scores
             self.round_ended = True
             self.round_end_time = time.time()
-        elif self.ball_pos[1] < BALL_RADIUS or self.ball_pos[1] > WALL_HEIGHT - BALL_RADIUS:
+        elif self.ball_pos[1] < BALL_RADIUS or self.ball_pos[1] > config.WALL_HEIGHT - BALL_RADIUS:
             self.ball_vel[1] = -self.ball_vel[1]
 
         # Re-enable collisions when ball crosses center
         if self.ignore_collisions:
-            if (self.target_side == 'left' and self.ball_pos[0] < WALL_WIDTH / 2) or \
-               (self.target_side == 'right' and self.ball_pos[0] > WALL_WIDTH / 2):
+            if (self.target_side == 'left' and self.ball_pos[0] < config.WALL_WIDTH / 2) or \
+               (self.target_side == 'right' and self.ball_pos[0] > config.WALL_WIDTH / 2):
                 self.ignore_collisions = False
                 self.target_side = None
 
     def reset_ball(self):
         """Reset ball to center with initial speed."""
-        self.ball_pos = np.array([WALL_WIDTH / 2, WALL_HEIGHT / 2])
+        self.ball_pos = np.array([config.WALL_WIDTH / 2, config.WALL_HEIGHT / 2])
         self.ball_vel = np.array([
             random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE,
             random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE, 0.5 * INITIAL_BALL_SPEED_SCALE)

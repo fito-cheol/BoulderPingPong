@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 import pygame
 from typing import Optional, Tuple
-from config import CHESSBOARD_SIZE, SQUARE_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT, WALL_WIDTH, WALL_HEIGHT
+import config
+from config import CHESSBOARD_SIZE, SQUARE_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT
 from PIL import Image, ImageDraw, ImageFont
 import os
 
@@ -76,9 +77,9 @@ def create_default_homography() -> np.ndarray:
     """화면과 벽 치수를 기반으로 기본 호모그래피 행렬 생성"""
     src_points = np.float32([
         [0, 0],
-        [WALL_WIDTH, 0],
-        [WALL_WIDTH, WALL_HEIGHT],
-        [0, WALL_HEIGHT]
+        [config.WALL_WIDTH, 0],
+        [config.WALL_WIDTH, config.WALL_HEIGHT],
+        [0, config.WALL_HEIGHT]
     ])
     dst_points = np.float32([
         [0, 0],
@@ -99,7 +100,7 @@ def create_default_homography() -> np.ndarray:
 def calculate_homography(corners: np.ndarray, obj_points: np.ndarray) -> Optional[np.ndarray]:
     """검출된 코너에서 호모그래피 행렬 계산"""
     src_points = corners.reshape(-1, 2)
-    dst_points = obj_points * np.array([SCREEN_WIDTH / WALL_WIDTH, SCREEN_HEIGHT / WALL_HEIGHT])
+    dst_points = obj_points * np.array([SCREEN_WIDTH / config.WALL_WIDTH, SCREEN_HEIGHT / config.WALL_HEIGHT])
     homography, _ = cv2.findHomography(src_points, dst_points, cv2.RANSAC, 5.0)
     return homography
 
@@ -174,23 +175,7 @@ def update_search_settings(camera, search_margin_x: float, search_margin_y: floa
     except Exception as e:
         print(f"검색 범위 설정 업데이트 실패: {e}")
 
-
-def display_camera_feed(frame: np.ndarray, corners_detected: bool) -> None:
-    """카메라 피드에 오버레이 텍스트와 검출된 코너를 표시"""
-    if corners_detected:
-        cv2.drawChessboardCorners(frame, CHESSBOARD_SIZE, corners, True)
-        frame = put_korean_text(frame, "체스보드 검출됨! 'c'를 눌러 캘리브레이션",
-                               (10, 30), 24, (0, 255, 0))
-    else:
-        frame = put_korean_text(frame, "카메라를 체스보드가 보이도록 조정",
-                               (10, 30), 24, (0, 0, 255))
-
-    frame = put_korean_text(frame, "c: 캘리브레이션, s: 건너뛰기, ESC: 종료",
-                           (10, frame.shape[0] - 30), 18, (255, 255, 255))
-    cv2.imshow("캘리브레이션 - 카메라 뷰", frame)
-
-
-def display_camera_feed_with_settings(frame: np.ndarray, corners_detected: bool,
+def display_camera_feed_with_settings(frame: np.ndarray, corners_detected: bool, corners,
                                     search_margin_x: float, search_margin_y: float,
                                     detection_confidence: float, presence_confidence: float, tracking_confidence: float,
                                     camera=None) -> None:
@@ -348,7 +333,7 @@ def calibrate_projector(camera, screen: pygame.Surface) -> Optional[np.ndarray]:
             continue
 
         corners_detected, corners = process_camera_frame(camera, frame)
-        display_camera_feed_with_settings(frame, corners_detected, search_margin_x, search_margin_y,
+        display_camera_feed_with_settings(frame, corners_detected, corners, search_margin_x, search_margin_y,
                                         detection_confidence, presence_confidence, tracking_confidence, camera)
 
         # OpenCV 키 이벤트 처리 (Pygame 이벤트와 중복 방지)

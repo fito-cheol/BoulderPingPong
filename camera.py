@@ -1,9 +1,9 @@
 import cv2
 import mediapipe as mp
-import numpy as np
 import time
 import os
-from config import WALL_WIDTH, WALL_HEIGHT, LANDMARKS_TO_TRACK, MAX_RECONNECT_ATTEMPTS, SCALE_FACTOR
+import config 
+from config import LANDMARKS_TO_TRACK, MAX_RECONNECT_ATTEMPTS
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -274,8 +274,8 @@ class Camera:
                     for idx, landmark in enumerate(pose_landmarks):
                         if idx in LANDMARKS_TO_TRACK:
                             try:
-                                x = landmark.x * WALL_WIDTH
-                                y = landmark.y * WALL_HEIGHT
+                                x = landmark.x * config.WALL_WIDTH
+                                y = landmark.y * config.WALL_HEIGHT
                                 positions.append([x, y])
                             except AttributeError as e:
                                 print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")
