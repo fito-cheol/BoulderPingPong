@@ -1,5 +1,5 @@
-WALL_WIDTH = 3.66
-WALL_HEIGHT = 3.66
+WALL_WIDTH = 1920
+WALL_HEIGHT = 1080
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
 FPS = 30
@@ -19,9 +19,9 @@ ROUND_END_DELAY = 1.0
 FULLSCREEN=True
 FOCUS_X = 0.0  # 초점의 x 오프셋 (미터 단위)
 FOCUS_Y = 0.0  # 초점의 y 오프셋 (미터 단위)
-WIDTH_ADJUST_STEP = 0.1  # 좌우폭 조절 단위 (미터)
-HEIGHT_ADJUST_STEP = 0.1  # 상하폭 조절 단위 (미터)
-FOCUS_ADJUST_STEP = 0.1  # 초점 이동 단위 (미터)
+WIDTH_ADJUST_STEP = 20  # 좌우폭 조절 단위 (미터)
+HEIGHT_ADJUST_STEP = 20  # 상하폭 조절 단위 (미터)
+FOCUS_ADJUST_STEP = 20  # 초점 이동 단위 (미터)
 COLORS = {
     'hand': (0, 0, 255),
     'foot': (0, 220, 220),

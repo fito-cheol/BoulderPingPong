@@ -76,8 +76,8 @@ class Renderer:
         if points.ndim == 1:
             points = points.reshape(1, -1)
         points = points - np.array([FOCUS_X, FOCUS_Y])
-        scale_x = SCREEN_WIDTH / WALL_WIDTH
-        scale_y = SCREEN_HEIGHT / WALL_HEIGHT
+        scale_x = SCREEN_WIDTH
+        scale_y = SCREEN_HEIGHT
         return points * np.array([scale_x, scale_y])
 
     def draw_borders_and_center_line(self) -> None:
@@ -109,21 +109,22 @@ class Renderer:
             frame = self.camera.get_frame()
             if frame is not None:
                 frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame_resized = cv2.resize(frame_rgb, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                frame_resized = cv2.resize(frame_rgb, (WALL_WIDTH, WALL_HEIGHT))
                 frame_surface = pygame.surfarray.make_surface(frame_resized.swapaxes(0, 1))
-                self.screen.blit(frame_surface, (0, 0))
+                self.screen.blit(frame_surface, (FOCUS_X, FOCUS_Y))
             else:
                 self.screen.fill((0, 0, 0))
         else:
             self.screen.fill((0, 0, 0))
 
+        # 테두리 중앙 그리기
         self.draw_borders_and_center_line()
 
         # 공 그리기
         try:
             ball_screen = self.transform_coordinates(ball_pos)
             if ball_screen.shape[0] > 0:
-                ball_radius_pixel = int(BALL_RADIUS * SCREEN_WIDTH / WALL_WIDTH)
+                ball_radius_pixel = int(BALL_RADIUS * SCREEN_WIDTH)
                 border_thickness = max(1, int(ball_radius_pixel * BALL_BORDER_RATIO))
                 x, y = int(ball_screen[0, 0]), int(ball_screen[0, 1])
                 if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
@@ -138,7 +139,7 @@ class Renderer:
                 screen_pos = self.transform_coordinates(pos)
                 if screen_pos.shape[0] > 0:
                     color = COLORS['hand'] if i < 2 else COLORS['foot']
-                    radius = int(HITBOX_RADIUS * SCREEN_WIDTH / WALL_WIDTH)
+                    radius = int(HITBOX_RADIUS * SCREEN_WIDTH )
                     x, y = int(screen_pos[0, 0]), int(screen_pos[0, 1])
                     if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
                         pygame.draw.circle(self.screen, color, (x, y), radius)

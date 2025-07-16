@@ -26,6 +26,7 @@ class Physics:
                 self.round_end_time = None
             return
 
+        """ 공과 사람 충돌 처리 """
         if not self.ignore_collisions:
             for pos in player_positions:
                 if self.check_collision(self.ball_pos, pos, BALL_RADIUS, HITBOX_RADIUS):
@@ -35,18 +36,26 @@ class Physics:
                         -BALL_SPEED_SCALE if self.target_side == 'left' else BALL_SPEED_SCALE,
                         random.uniform(-0.5 * BALL_SPEED_SCALE, 0.5 * BALL_SPEED_SCALE)
                     ])
+                    break
 
+        """ 공 위치 업데이트 """
         self.ball_pos += self.ball_vel * dt
 
-        if self.ball_pos[0] < 0:
+        """ 공과 벽 충돌 처리 """
+        isTouchLeft = self.ball_pos[0] < 0
+        isTouchRight = self.ball_pos[0] > WALL_WIDTH
+        isTouchBottom = self.ball_pos[1] < BALL_RADIUS
+        isTouchTop = self.ball_pos[1] > WALL_HEIGHT - BALL_RADIUS
+
+        if isTouchLeft:
             self.score[1] += 1
             self.round_ended = True
             self.round_end_time = time.time()
-        elif self.ball_pos[0] > WALL_WIDTH:
+        elif isTouchRight:
             self.score[0] += 1
             self.round_ended = True
             self.round_end_time = time.time()
-        elif self.ball_pos[1] < BALL_RADIUS or self.ball_pos[1] > WALL_HEIGHT - BALL_RADIUS:
+        elif isTouchBottom or isTouchTop:
             self.ball_vel[1] = -self.ball_vel[1]
 
         if self.ignore_collisions:
@@ -64,6 +73,7 @@ class Physics:
         ], dtype=float)
         self.ignore_collisions = False
         self.target_side = None
+
 
     def reset_game(self):
         """게임 전체를 재시작"""
