@@ -105,6 +105,15 @@ def select_camera():
 
 
 class Camera:
+
+    model_paths = [
+            r"pose_landmarker_lite.task",      # 가장 가벼운 모델
+            r"pose_landmarker_full.task",      # 중간 모델
+            r"pose_landmarker_heavy.task"      # 가장 무거운 모델
+        ]
+    model_path = r"pose_landmarker_heavy.task"
+    confidence_threshold = 0.5 # 무거울 수록 높은 값 지정 ex) lite는 0.3
+
     def __init__(self, camera_index=None, progress_callback=None):
         # 카메라 인덱스가 지정되지 않으면 자동 선택
         if camera_index is None:
@@ -168,20 +177,8 @@ class Camera:
         # MediaPipe 모델 로딩 최적화
         if self.progress_callback:
             self.progress_callback("AI 모델 로딩 중...")
-        model_paths = [
-            r"pose_landmarker_lite.task",      # 가장 가벼운 모델
-            r"pose_landmarker_full.task",      # 중간 모델
-            r"pose_landmarker_heavy.task"      # 가장 무거운 모델
-        ]
-        
-        self.model_path = None
-        for model_path in model_paths:
-            if os.path.exists(model_path):
-                self.model_path = model_path
-                print(f"사용할 모델: {model_path}")
-                break
-        
-        if not self.model_path:
+
+        if not os.path.exists(self.model_path):
             raise RuntimeError(
                 f"Error: No model file found. Please download one of the models:\n"
                 f"  - pose_landmarker_lite.task (recommended)\n"
@@ -190,21 +187,13 @@ class Camera:
                 f"From: https://developers.google.com/mediapipe/solutions/vision/pose_landmarker#models"
             )
 
-        # 모델 크기에 따른 설정 조정
-        if "lite" in self.model_path:
-            confidence_threshold = 0.3  # 가벼운 모델은 더 낮은 임계값
-        elif "full" in self.model_path:
-            confidence_threshold = 0.4
-        else:  # heavy
-            confidence_threshold = 0.5
-
         options = PoseLandmarkerOptions(
             base_options=BaseOptions(model_asset_path=self.model_path),
             running_mode=VisionRunningMode.VIDEO,
             num_poses=2,
-            min_pose_detection_confidence=confidence_threshold,
-            min_pose_presence_confidence=confidence_threshold,
-            min_tracking_confidence=confidence_threshold
+            min_pose_detection_confidence=self.confidence_threshold,
+            min_pose_presence_confidence=self.confidence_threshold,
+            min_tracking_confidence=self.confidence_threshold
         )
         
         print("MediaPipe 모델 로딩 중...")
@@ -285,8 +274,8 @@ class Camera:
                     for idx, landmark in enumerate(pose_landmarks):
                         if idx in LANDMARKS_TO_TRACK:
                             try:
-                                x = landmark.x * self.camera_width * (WALL_WIDTH / self.camera_width)
-                                y = landmark.y * self.camera_height * (WALL_HEIGHT / self.camera_height)
+                                x = landmark.x * WALL_WIDTH
+                                y = landmark.y * WALL_HEIGHT
                                 positions.append([x, y])
                             except AttributeError as e:
                                 print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")
