@@ -46,26 +46,29 @@ class Renderer:
         print(f"카메라 화면 {'표시' if self.show_camera else '숨김'}")
 
     def transform_coordinates(self, points: Union[np.ndarray, List[float]]) -> np.ndarray:
-        """호모그래피와 초점 오프셋을 사용해 좌표 변환"""
-        if not self.use_homography:
-            return self.simple_transform(points)
-
-        try:
-            points = np.array(points, dtype=np.float32)
-            if points.ndim == 1:
-                points = points.reshape(1, -1)
-            if points.shape[1] != 2:
-                points = points.reshape(1, 2)
-
-            points = points - np.array([FOCUS_X, FOCUS_Y])
-            points_homogeneous = np.column_stack([points, np.ones(points.shape[0])])
-            transformed_homogeneous = self.homography @ points_homogeneous.T
-            transformed = transformed_homogeneous[:2] / transformed_homogeneous[2]
-            return transformed.T
-
-        except Exception as e:
-            print(f"호모그래피 변환 실패: {e}, 기본 변환 사용")
-            return self.simple_transform(points)
+        """ 호모그래피 사용하지 않고 단순 변환 """
+        return self.simple_transform(points)
+        #
+        # """호모그래피와 초점 오프셋을 사용해 좌표 변환"""
+        # if not self.use_homography:
+        #     return self.simple_transform(points)
+        #
+        # try:
+        #     points = np.array(points, dtype=np.float32)
+        #     if points.ndim == 1:
+        #         points = points.reshape(1, -1)
+        #     if points.shape[1] != 2:
+        #         points = points.reshape(1, 2)
+        #
+        #     points = points - np.array([FOCUS_X, FOCUS_Y])
+        #     points_homogeneous = np.column_stack([points, np.ones(points.shape[0])])
+        #     transformed_homogeneous = self.homography @ points_homogeneous.T2
+        #     transformed = transformed_homogeneous[:2] / transformed_homogeneous[2]
+        #     return transformed.T
+        #
+        # except Exception as e:
+        #     print(f"호모그래피 변환 실패: {e}, 기본 변환 사용")
+        #     return self.simple_transform(points)
 
     def simple_transform(self, points: Union[np.ndarray, List[float]]) -> np.ndarray:
         """호모그래피 없이 기본 선형 변환 적용"""
@@ -159,15 +162,6 @@ class Renderer:
                 self.screen.blit(key_text, key_rect)
         except Exception as e:
             print(f"키 상태 렌더링 오류: {e}")
-
-        # 캘리브레이션 상태 경고
-        if not self.use_homography:
-            try:
-                warning_text = self.font.render("기본 변환 사용 중 (캘리브레이션 없음)", True, (255, 255, 0))
-                warning_rect = warning_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - WARNING_Y_OFFSET))
-                self.screen.blit(warning_text, warning_rect)
-            except Exception as e:
-                print(f"경고 텍스트 렌더링 오류: {e}")
 
         pygame.display.flip()
 

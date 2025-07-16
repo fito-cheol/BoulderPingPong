@@ -101,12 +101,13 @@ def run_pygame_mode():
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN if FULLSCREEN else 0)
         pygame.display.set_caption("Interactive Soccer Game")
 
-        print("\n=== 캘리브레이션 시작 ===")
-        homography = calibrate_projector(camera, screen)
-
-        if homography is None:
-            print("캘리브레이션이 취소되었습니다. 프로그램을 종료합니다.")
-            return
+        # 호모그래피 사용 X
+        homography = None
+        # print("\n=== 캘리브레이션 시작 ===")
+        # homography = calibrate_projector(camera, screen)
+        # if homography is None:
+        #     print("캘리브레이션이 취소되었습니다. 프로그램을 종료합니다.")
+        #     return
 
         print("\n=== 게임 시작 ===")
         print("게임 조작법:")
