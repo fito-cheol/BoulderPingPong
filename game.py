@@ -10,17 +10,24 @@ MIN_WALL_SIZE = 0.1  # 최소 벽 크기 (미터)
 FRAME_TIME = 1 / FPS  # 프레임당 시간 (초)
 
 class Game:
+
     def __init__(self, camera, homography: np.ndarray):
         """게임 초기화: 카메라, 물리 엔진, 렌더러, 클럭 설정"""
         self.camera = camera
         self.physics = Physics()
         self.renderer = Renderer(homography, camera)
         self.clock = pygame.time.Clock()
+        self.is_processing = False
 
     def handle_key_events(self, event: pygame.event.Event) -> None:
+
+        if self.is_processing:  # 처리 중이면 새로운 입력 무시
+            return
+
         """키 입력 이벤트 처리"""
         import config
         if event.type == pygame.KEYDOWN:
+            self.is_processing = True
             self.renderer.update_key_state(event.key, True)
             if event.key == pygame.K_r:
                 self.physics.reset_game()
@@ -51,8 +58,10 @@ class Game:
                 print(f"화면 중심 X: {config.FOCUS_X:.1f}m")
             elif event.key == pygame.K_p:
                 self.renderer.toggle_camera()
+            self.is_processing = False
         elif event.type == pygame.KEYUP:
             self.renderer.update_key_state(event.key, False)
+            self.is_processing = False
 
     def run(self) -> None:
         """게임 메인 루프 실행"""

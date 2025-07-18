@@ -236,7 +236,19 @@ class Camera:
         self.reconnect_attempts += 1
         return False
 
+
     def get_player_positions(self):
+        """
+        카메라에서 프레임을 캡처하고 포즈 랜드마크를 감지하여 x, y 좌표 리스트를 반환합니다.
+
+        Args:
+            self: 카메라 캡처 및 포즈 랜드마크 객체를 포함한 클래스 인스턴스.
+
+        Returns:
+            [x, y] 좌표 리스트로, x와 y는 0과 1 사이의 정규화된 값이며, 프레임에서 감지된 사람의 추적된 랜드마크 위치를 나타냅니다.
+            프레임 캡처 또는 처리 중 오류가 발생하면 빈 리스트를 반환합니다.
+        """
+
         if not self.cap.isOpened():
             if not self.reconnect_camera():
                 if self.reconnect_attempts > self.max_reconnect_attempts:
@@ -274,8 +286,8 @@ class Camera:
                     for idx, landmark in enumerate(pose_landmarks):
                         if idx in LANDMARKS_TO_TRACK:
                             try:
-                                x = landmark.x * config.WALL_WIDTH
-                                y = landmark.y * config.WALL_HEIGHT
+                                x = landmark.x
+                                y = landmark.y
                                 positions.append([x, y])
                             except AttributeError as e:
                                 print(f"Error processing landmark {idx} for person {person_idx + 1}: {e}")

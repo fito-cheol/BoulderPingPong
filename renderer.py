@@ -4,8 +4,8 @@ import cv2
 from typing import Tuple, List, Union
 # 변경되는 변수는 직접 import config.WALL_WIDTH, config.WALL_HEIGHT, config.FOCUS_X, config.FOCUS_Y
 import config
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RADIUS, HITBOX_RADIUS, SCALE_FACTOR, \
-    COLORS
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RADIUS, SCALE_FACTOR, \
+    COLORS, HAND_RADIUS
 
 
 
@@ -52,37 +52,24 @@ class Renderer:
     def transform_coordinates(self, points: Union[np.ndarray, List[float]]) -> np.ndarray:
         """ 호모그래피 사용하지 않고 단순 변환 """
         return self.simple_transform(points)
-        #
-        # """호모그래피와 초점 오프셋을 사용해 좌표 변환"""
-        # if not self.use_homography:
-        #     return self.simple_transform(points)
-        #
-        # try:
-        #     points = np.array(points, dtype=np.float32)
-        #     if points.ndim == 1:
-        #         points = points.reshape(1, -1)
-        #     if points.shape[1] != 2:
-        #         points = points.reshape(1, 2)
-        #
-        #     points = points - np.array([config.FOCUS_X, config.FOCUS_Y])
-        #     points_homogeneous = np.column_stack([points, np.ones(points.shape[0])])
-        #     transformed_homogeneous = self.homography @ points_homogeneous.T2
-        #     transformed = transformed_homogeneous[:2] / transformed_homogeneous[2]
-        #     return transformed.T
-        #
-        # except Exception as e:
-        #     print(f"호모그래피 변환 실패: {e}, 기본 변환 사용")
-        #     return self.simple_transform(points)
 
-    def simple_transform(self, points: Union[np.ndarray, List[float]]) -> np.ndarray:
-        """호모그래피 없이 기본 선형 변환 적용"""
+    def transform_ball(self, points: Union[np.ndarray, List[float]]) -> np.ndarray:
         points = np.array(points, dtype=np.float32)
         if points.ndim == 1:
             points = points.reshape(1, -1)
-        points = points - np.array([config.FOCUS_X, config.FOCUS_Y])
+
         scale_x = SCREEN_WIDTH
         scale_y = SCREEN_HEIGHT
         return points * np.array([scale_x, scale_y])
+
+    def transform_player(self, points: Union[np.ndarray, List[float]]) -> np.ndarray:
+        points = np.array(points, dtype=np.float32)
+        if points.ndim == 1:
+            points = points.reshape(1, -1)
+
+        scale_x = config.WALL_WIDTH
+        scale_y = config.WALL_HEIGHT
+        return points * np.array([scale_x, scale_y]) + np.array([config.FOCUS_X, config.FOCUS_Y])
 
     def draw_borders_and_center_line(self) -> None:
         """테두리와 점선 중앙선 그리기"""
@@ -108,8 +95,9 @@ class Renderer:
 
     def render(self, ball_pos: List[float], player_positions: List[List[float]], score: Tuple[int, int]) -> None:
         """게임 화면 렌더링: 배경, 테두리, 공, 플레이어, 점수, 키 상태"""
+
         # 카메라 프레임 렌더링
-        print(config.WALL_WIDTH, config.WALL_HEIGHT)
+        self.screen.fill((0, 0, 0))  # 초기화
         if self.show_camera:
             frame = self.camera.get_frame()
             if frame is not None:
@@ -127,9 +115,9 @@ class Renderer:
 
         # 공 그리기
         try:
-            ball_screen = self.transform_coordinates(ball_pos)
+            ball_screen = self.transform_ball(ball_pos)
             if ball_screen.shape[0] > 0:
-                ball_radius_pixel = int(BALL_RADIUS * SCREEN_WIDTH)
+                ball_radius_pixel = int(BALL_RADIUS)
                 border_thickness = max(1, int(ball_radius_pixel * BALL_BORDER_RATIO))
                 x, y = int(ball_screen[0, 0]), int(ball_screen[0, 1])
                 if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
@@ -139,12 +127,16 @@ class Renderer:
             print(f"공 렌더링 오류: {e}")
 
         # 플레이어(손/발) 그리기
+
         try:
             for i, pos in enumerate(player_positions):
-                screen_pos = self.transform_coordinates(pos)
+                if i == 0:
+                    print(i, pos)
+                screen_pos = self.transform_player(pos)
+                # print('screen pos', i, screen_pos)
                 if screen_pos.shape[0] > 0:
                     color = COLORS['hand'] if i < 2 else COLORS['foot']
-                    radius = int(HITBOX_RADIUS * SCREEN_WIDTH )
+                    radius = int(HAND_RADIUS)
                     x, y = int(screen_pos[0, 0]), int(screen_pos[0, 1])
                     if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
                         pygame.draw.circle(self.screen, color, (x, y), radius)
