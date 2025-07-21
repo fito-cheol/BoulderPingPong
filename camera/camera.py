@@ -107,11 +107,11 @@ def select_camera():
 class Camera:
 
     model_paths = [
-            r"pose_landmarker_lite.task",      # 가장 가벼운 모델
-            r"pose_landmarker_full.task",      # 중간 모델
-            r"pose_landmarker_heavy.task"      # 가장 무거운 모델
+            r"camera/pose_landmarker_lite.task",      # 가장 가벼운 모델
+            r"camera/pose_landmarker_full.task",      # 중간 모델
+            r"camera/pose_landmarker_heavy.task"      # 가장 무거운 모델
         ]
-    model_path = r"pose_landmarker_heavy.task"
+    model_path = r"camera/pose_landmarker_heavy.task"
     confidence_threshold = 0.5 # 무거울 수록 높은 값 지정 ex) lite는 0.3
 
     def __init__(self, camera_index=None, progress_callback=None):

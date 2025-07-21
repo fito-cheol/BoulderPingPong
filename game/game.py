@@ -1,8 +1,8 @@
 import pygame
 import time
 import numpy as np
-from physics import Physics
-from renderer import Renderer
+from game.physics import Physics
+from game.renderer import Renderer
 from config import FPS, WIDTH_ADJUST_STEP, HEIGHT_ADJUST_STEP, FOCUS_ADJUST_STEP
 
 # 상수 정의

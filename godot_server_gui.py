@@ -7,12 +7,13 @@ import socket
 import struct
 import base64
 import hashlib
-from camera import Camera, find_available_cameras
-from calibration import calibrate_projector
+from camera.camera import Camera
+from camera.calibration import calibrate_projector
 import pygame
-import numpy as np
 import cv2
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN
+
+from util.debug import timer_decorator
 
 class WebSocketServer:
     def __init__(self, camera, host='localhost', port=8080):
@@ -28,7 +29,8 @@ class WebSocketServer:
         self.last_response_time_ms = 0
         self.pose_loop_thread = threading.Thread(target=self.pose_loop, daemon=True)
         self.pose_loop_thread.start()
-    
+
+    @timer_decorator
     def pose_loop(self):
         while True:
             if self.camera:
@@ -40,7 +42,8 @@ class WebSocketServer:
                 except Exception as e:
                     print("[Pose Loop Error]", e)
             time.sleep(0.03)  # ~30 FPS
-    
+
+    @timer_decorator
     def broadcast_pose_data(self):
         """연결된 모든 클라이언트에게 포즈 데이터 전송"""
         if not self.clients:
@@ -108,7 +111,8 @@ class WebSocketServer:
                 
         except Exception as e:
             print(f"브로드캐스트 오류: {e}")
-    
+
+    @timer_decorator
     def create_websocket_frame(self, message):
         """WebSocket 프레임 생성"""
         message_bytes = message.encode('utf-8')
@@ -129,7 +133,8 @@ class WebSocketServer:
         
         frame.extend(message_bytes)
         return frame
-    
+
+    @timer_decorator
     def handle_websocket_handshake(self, client_socket, request):
         """WebSocket 핸드셰이크 처리"""
         try:
@@ -258,7 +263,7 @@ class WebSocketServer:
                 pass
         
         self.connected = False
-    
+
     def is_connected(self):
         """연결 상태 확인"""
         return self.connected and len(self.clients) > 0
@@ -525,7 +530,8 @@ class GodotServerGUI:
         self.server_running = False
         
         self.setup_ui()
-        
+
+    @timer_decorator
     def setup_ui(self):
         """UI 구성"""
         # 메인 프레임
@@ -671,7 +677,8 @@ class GodotServerGUI:
         """로그 메시지 추가"""
         self.log_text.insert(tk.END, f"[{time.strftime('%H:%M:%S')}] {message}\n")
         self.log_text.see(tk.END)
-        
+
+    @timer_decorator
     def start_server(self):
         """서버 시작"""
         if not self.camera:
@@ -890,7 +897,7 @@ class GodotServerGUI:
         try:
             if hasattr(self.camera, 'landmarker'):
                 # 새로운 설정으로 landmarker 재생성
-                from camera import PoseLandmarkerOptions, BaseOptions, VisionRunningMode
+                from camera.camera import PoseLandmarkerOptions, BaseOptions, VisionRunningMode
                 
                 options = PoseLandmarkerOptions(
                     base_options=BaseOptions(model_asset_path=self.camera.model_path),
@@ -905,7 +912,7 @@ class GodotServerGUI:
                 self.camera.landmarker.close()
                 
                 # 새로운 landmarker 생성
-                from camera import PoseLandmarker
+                from camera.camera import PoseLandmarker
                 self.camera.landmarker = PoseLandmarker.create_from_options(options)
                 
                 self.log_message(f"인식 설정 업데이트: Detection={detection_confidence:.1f}, Presence={presence_confidence:.1f}, Tracking={tracking_confidence:.1f}")
@@ -934,7 +941,8 @@ class GodotServerGUI:
         except Exception as e:
             self.log_message(f"웹소켓 테스트 파일 열기 실패: {e}")
             messagebox.showerror("오류", f"웹소켓 테스트 파일 열기 실패:\n{e}")
-    
+
+    @timer_decorator
     def update_status(self):
         """상태 업데이트"""
         if self.pose_server and self.server_running:

@@ -1,9 +1,7 @@
 import pygame
 import tkinter as tk
-from tkinter import messagebox
-from camera import Camera
-from calibration import calibrate_projector
-from game import Game
+from camera.camera import Camera
+from game.game import Game
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN
 from godot_server_gui import GodotServerGUI
 

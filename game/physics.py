@@ -18,10 +18,7 @@ class Physics:
     def check_collision(self, ball_pos, hit_pos, hit_radius):
         """공과 히트박스 간 충돌 감지"""
         distance = np.linalg.norm(ball_pos - np.array(hit_pos))
-        if distance < hit_radius:
-            print('COLLISION @@@@@@@@@@@@@@')
-            print(self.ball_pos, hit_pos)
-            print('distance', distance)
+
         return distance < hit_radius
 
     def update(self, player_positions, dt):

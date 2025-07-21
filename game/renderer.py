@@ -130,8 +130,6 @@ class Renderer:
 
         try:
             for i, pos in enumerate(player_positions):
-                if i == 0:
-                    print(i, pos)
                 screen_pos = self.transform_player(pos)
                 # print('screen pos', i, screen_pos)
                 if screen_pos.shape[0] > 0:
