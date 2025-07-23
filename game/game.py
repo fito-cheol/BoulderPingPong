@@ -9,6 +9,7 @@ from config import FPS, WIDTH_ADJUST_STEP, HEIGHT_ADJUST_STEP, FOCUS_ADJUST_STEP
 MIN_WALL_SIZE = 0.1  # 최소 벽 크기 (미터)
 FRAME_TIME = 1 / FPS  # 프레임당 시간 (초)
 
+
 class Game:
 
     def __init__(self, camera, homography: np.ndarray):
@@ -86,7 +87,8 @@ class Game:
             # 플레이어 위치 업데이트 및 렌더링
             player_positions = self.camera.get_player_positions()
             self.physics.update(player_positions, dt)
-            self.renderer.render(self.physics.ball_pos, player_positions, self.physics.score)
+            self.renderer.render(self.physics.ball_pos, player_positions, self.physics.score,
+                                 self.physics.goal_scored, self.physics.ball_trail)
             self.clock.tick(FPS)
 
         # 게임 종료 및 리소스 정리
