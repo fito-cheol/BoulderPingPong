@@ -7,8 +7,8 @@ import pygame
 
 # 상수 정의
 MAX_SCREEN = 1  # 화면 크기 기준 (정규화된 좌표)
-BALL_TRAIL_LENGTH = 10  # 공 궤적 최대 길이
-COLLISION_SOUND_PATH = 'assets/332058__qubodup__collision.flac'  # 충돌 사운드 파일 경로
+BALL_TRAIL_LENGTH = 20  # 공 궤적 최대 길이
+COLLISION_SOUND_PATH = 'assets/170631__singintime__smash_close.wav'  # 충돌 사운드 파일 경로
 
 class Physics:
     """게임의 물리 엔진을 관리하는 클래스"""
@@ -120,6 +120,7 @@ class Physics:
                         -BALL_SPEED_SCALE if self.target_side == 'left' else BALL_SPEED_SCALE,
                         random.uniform(-0.5 * BALL_SPEED_SCALE, 0.5 * BALL_SPEED_SCALE)
                     ])
+                    print('충돌', self.ball_vel)
                     if self.collision_sound:
                         self.collision_sound.play()
                     break
@@ -134,6 +135,7 @@ class Physics:
                 random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE,
                 random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE, 0.5 * INITIAL_BALL_SPEED_SCALE)
             ], dtype=float)
+            print('기본', self.ball_vel)
             self.ignore_collisions = False
             self.target_side = None
             self.ball_trail = []
