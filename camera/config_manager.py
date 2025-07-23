@@ -2,6 +2,7 @@ import os
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
+
 @dataclass
 class CameraConfig:
     """Camera and pose landmarker configuration."""
@@ -16,5 +17,6 @@ class CameraConfig:
 
     def __post_init__(self):
         self.landmarks_to_track = self.landmarks_to_track or [
-            0, 11, 12, 15, 16, 23, 24, 27, 28
+            15, 16, 27, 28
         ]
+
