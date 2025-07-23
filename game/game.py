@@ -105,7 +105,7 @@ class Game:
         """Pygame 초기 설정"""
         pygame.init()
 
-    async def update_loop(self):
+    def update_loop(self):
         """게임 상태 업데이트 및 렌더링"""
         try:
             player_positions = self.camera.get_player_positions()  # 플레이어 위치 가져오기
@@ -120,7 +120,7 @@ class Game:
         except Exception as e:
             print(f"업데이트 루프 중 오류: {e}")
 
-    async def main(self):
+    def main(self):
         """Pyodide 호환을 위한 메인 게임 루프"""
         self.setup()
         last_update_time = time.time()
@@ -137,17 +137,15 @@ class Game:
                 current_time = time.time()
                 dt = current_time - last_update_time
                 if dt < FRAME_TIME:
-                    await asyncio.sleep(FRAME_TIME - dt)
                     continue
                 last_update_time = current_time
 
                 # 게임 상태 업데이트 및 렌더링
-                await self.update_loop()
+                self.update_loop()
                 self.clock.tick(FPS)
 
             except Exception as e:
                 print(f"메인 루프 중 오류: {e}")
-                await asyncio.sleep(FRAME_TIME)
 
     def cleanup(self):
         """리소스 정리"""

@@ -118,7 +118,7 @@ def run_pygame_mode():
 
         # 수정된 부분: camera와 homography 모두 전달
         game = Game(camera, homography)
-        game.run()
+        game.main()
 
     except RuntimeError as e:
         print(f"오류 발생: {e}")
@@ -156,4 +156,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    run_pygame_mode()
