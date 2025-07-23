@@ -2,9 +2,9 @@ import cv2
 import time
 import numpy as np
 from typing import List, Dict, Optional, Callable, Any
-from config_manager import CameraConfig
-from camera_manager import CameraManager
-from pose_processor import PoseProcessor
+from .config_manager import CameraConfig
+from .camera_manager import CameraManager
+from .pose_processor import PoseProcessor
 
 
 class Camera:

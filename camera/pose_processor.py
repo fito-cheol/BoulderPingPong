@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import os
 from typing import Dict, Any, Optional, Callable
-from config_manager import CameraConfig
+from .config_manager import CameraConfig
 
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
