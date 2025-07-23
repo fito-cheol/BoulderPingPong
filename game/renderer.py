@@ -265,10 +265,20 @@ class Renderer:
                     trail_screen = self.transform_ball(trail_pos)
                     if trail_screen.shape[0] > 0:
                         ball_radius_pixel = int(BALL_RADIUS)
-                        alpha = int(255 * (1 - i / len(ball_trail)))  # 페이드 효과
+                        # 비선형 알파 값 계산 (시작부분이 더 투명, 끝부분이 불투명)
+                        alpha = int(255 * (i / len(ball_trail)) ** 2)  # 제곱 함수로 부드러운 그라데이션
+                        alpha = max(10, min(255, alpha))  # 알파 값 10~255 사이로 제한
                         trail_surface = pygame.Surface((ball_radius_pixel * 2, ball_radius_pixel * 2), pygame.SRCALPHA)
-                        pygame.draw.circle(trail_surface, (*COLORS['ball'], alpha),
-                                        (ball_radius_pixel, ball_radius_pixel), ball_radius_pixel)
+                        # 그라데이션 효과를 위해 색상도 약간 조정
+                        color_intensity = (i / len(ball_trail)) ** 2
+                        trail_color = (
+                            int(COLORS['ball'][0] * color_intensity),
+                            int(COLORS['ball'][1] * color_intensity),
+                            int(COLORS['ball'][2] * color_intensity),
+                            alpha
+                        )
+                        pygame.draw.circle(trail_surface, trail_color,
+                                           (ball_radius_pixel, ball_radius_pixel), ball_radius_pixel)
                         x, y = int(trail_screen[0, 0] + offset_x), int(trail_screen[0, 1] + offset_y)
                         if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
                             self.screen.blit(trail_surface, (x - ball_radius_pixel, y - ball_radius_pixel))
