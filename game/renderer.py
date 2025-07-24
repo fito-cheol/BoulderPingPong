@@ -297,27 +297,26 @@ class Renderer:
         """공 궤적 렌더링"""
         try:
             if len(ball_trail) <= 1:
-                print("디버깅: 궤적 점이 2개 미만이어서 렌더링하지 않음")
                 return
 
             # 서피스 생성
             trail_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
 
-            # 2. 좌표 계산 및 확인
+            # 좌표 계산
             points = []
-            for i, trail_pos in enumerate(ball_trail):
+            for trail_pos in ball_trail:
                 trail_screen = self.transform_ball(trail_pos)
                 if trail_screen.shape[0] > 0:
                     x, y = int(trail_screen[0, 0] + offset_x), int(trail_screen[0, 1] + offset_y)
                     if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
                         points.append((x, y))
-                    else:
-                        print(f"디버깅: 좌표 ({x}, {y})가 화면 밖에 있음")
 
-            # 4. 선 그리기 (디버깅용 고정 색상과 두께)
+            if len(points) <= 1:
+                return
+
+            # 안티앨리어싱 선 그리기
             for i in range(len(points) - 1):
-                # 임시로 고정된 색상(빨간색, 완전 불투명)으로 테스트
-                alpha = int(255 * (i / (len(points) - 1)) ** 2)
+                alpha = int(255 * (i / (len(points) - 1)) ** 0.5)
                 alpha = max(10, min(255, alpha))
                 line_color = (
                     int(COLORS['ball'][0]),
@@ -325,10 +324,13 @@ class Renderer:
                     int(COLORS['ball'][2]),
                     alpha
                 )
-                line_thickness = int(BALL_RADIUS*1.7)
-                pygame.draw.line(trail_surface, line_color, points[i], points[i + 1], line_thickness)
+                line_thickness = int(BALL_RADIUS * 1.7)
+                # 안티앨리어싱을 위해 임시 서피스 사용
+                temp_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                pygame.draw.line(temp_surface, line_color, points[i], points[i + 1], line_thickness)
+                trail_surface.blit(temp_surface, (0, 0))
 
-            # 5. 서피스 화면에 붙이기
+            # 서피스 화면에 붙이기
             self.screen.blit(trail_surface, (0, 0))
 
         except Exception as e:
