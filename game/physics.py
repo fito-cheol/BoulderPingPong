@@ -7,7 +7,7 @@ import pygame
 
 # 상수 정의
 MAX_SCREEN = 1  # 화면 크기 기준 (정규화된 좌표)
-BALL_TRAIL_LENGTH = 20  # 공 궤적 최대 길이
+BALL_TRAIL_LENGTH = 60  # 공 궤적 최대 길이
 COLLISION_SOUND_PATH = 'assets/170631__singintime__smash_close.wav'  # 충돌 사운드 파일 경로
 
 class Physics:
@@ -135,7 +135,6 @@ class Physics:
                 random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE,
                 random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE, 0.5 * INITIAL_BALL_SPEED_SCALE)
             ], dtype=float)
-            print('기본', self.ball_vel)
             self.ignore_collisions = False
             self.target_side = None
             self.ball_trail = []
