@@ -8,7 +8,8 @@ import pygame
 # 상수 정의
 MAX_SCREEN = 1  # 화면 크기 기준 (정규화된 좌표)
 BALL_TRAIL_LENGTH = 60  # 공 궤적 최대 길이
-COLLISION_SOUND_PATH = 'assets/170631__singintime__smash_close.wav'  # 충돌 사운드 파일 경로
+COLLISION_SOUND_PATH = 'assets/369515__lefty_studios__jumping-sfx.wav'  # 충돌 사운드 파일 경로
+SCORE_SOUND_PATH = 'assets/33308__erlingx__time.wav'
 
 class Physics:
     """게임의 물리 엔진을 관리하는 클래스"""
@@ -30,6 +31,7 @@ class Physics:
         try:
             pygame.mixer.init()
             self.collision_sound = pygame.mixer.Sound(COLLISION_SOUND_PATH)
+            self.score_sound = pygame.mixer.Sound(SCORE_SOUND_PATH)
         except FileNotFoundError:
             print(f"충돌 사운드 파일을 '{COLLISION_SOUND_PATH}'에서 찾을 수 없습니다. 나중에 추가해 주세요.")
         except Exception as e:
@@ -99,11 +101,15 @@ class Physics:
                 self.round_ended = True
                 self.round_end_time = time.time()
                 self.goal_scored = True  # 화면 흔들림 효과 트리거
+                if self.score_sound:
+                    self.score_sound.play()
             elif is_touch_right:
                 self.score[0] += 1  # 왼쪽 플레이어 점수 증가
                 self.round_ended = True
                 self.round_end_time = time.time()
                 self.goal_scored = True  # 화면 흔들림 효과 트리거
+                if self.score_sound:
+                    self.score_sound.play()
             elif is_touch_bottom or is_touch_top:
                 self.ball_vel[1] = -self.ball_vel[1]  # Y축 속도 반전
         except Exception as e:

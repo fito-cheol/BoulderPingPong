@@ -6,6 +6,7 @@ import config
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RADIUS, SCALE_FACTOR, \
     COLORS, HAND_RADIUS
 import time
+import math
 import random
 
 # 상수 정의
@@ -18,8 +19,10 @@ BALL_BORDER_RATIO = 0.1  # 공 테두리 비율
 SCORE_Y_OFFSET = int(50 * SCALE_FACTOR)  # 점수 텍스트 Y 오프셋 (픽셀)
 WARNING_Y_OFFSET = 50  # 경고 텍스트 Y 오프셋 (픽셀)
 KEY_STATUS_Y_OFFSET = int(50 * SCALE_FACTOR)  # 키 상태 텍스트 Y 오프셋 (픽셀)
-SHAKE_DURATION = 2.0  # 화면 흔들림 지속 시간 (초)
-SHAKE_MAGNITUDE = 10  # 화면 흔들림 최대 오프셋 (픽셀)
+
+SHAKE_DURATION = 1.5  # 흔들림 지속 시간 (초)
+SHAKE_MAGNITUDE = 10   # 최대 흔들림 크기 (픽셀)
+SHAKE_FREQUENCY = 10  # 흔들림 주파수 (진동 속도)
 
 class Renderer:
     """게임 화면을 렌더링하는 클래스"""
@@ -205,20 +208,24 @@ class Renderer:
         except Exception as e:
             print(f"플레이어 렌더링 중 오류: {e}")
 
-    def get_screen_shake(self, goal_scored: bool) -> Tuple[int, int]:
-        """화면 흔들림 효과 계산"""
+    def get_screen_shake(self, goal_scored: bool) -> tuple[int, int]:
+        """부드러운 화면 흔들림 효과 계산"""
         try:
             if goal_scored and self.shake_start_time is None:
                 self.shake_start_time = time.time()
+                self.shake_phase = random.uniform(0, 2 * math.pi)  # 랜덤 시작 위상
             elif self.shake_start_time is not None:
                 elapsed = time.time() - self.shake_start_time
                 if elapsed < SHAKE_DURATION:
-                    return (
-                        random.randint(-SHAKE_MAGNITUDE, SHAKE_MAGNITUDE),
-                        random.randint(-SHAKE_MAGNITUDE, SHAKE_MAGNITUDE)
-                    )
+                    # 시간에 따른 감쇠 효과 (선형 감쇠)
+                    amplitude = SHAKE_MAGNITUDE * (1 - elapsed / SHAKE_DURATION)
+                    # 사인파를 사용한 부드러운 흔들림
+                    shake_x = amplitude * math.sin(SHAKE_FREQUENCY * elapsed + self.shake_phase)
+                    shake_y = amplitude * math.cos(SHAKE_FREQUENCY * elapsed + self.shake_phase)
+                    return (int(shake_x), int(shake_y))
                 else:
                     self.shake_start_time = None
+                    self.shake_phase = None
                     return (0, 0)
             return (0, 0)
         except Exception as e:
