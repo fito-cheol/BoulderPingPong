@@ -256,42 +256,6 @@ class Renderer:
                     pygame.draw.circle(self.screen, COLORS['ball_border'], (x, y), ball_radius_pixel, border_thickness)
         except Exception as e:
             print(f"공 렌더링 중 오류: {e}")
-    #
-    # def render_trail(self, ball_trail: List[np.ndarray], offset_x: int, offset_y: int) -> None:
-    #     """공 궤적 렌더링"""
-    #     try:
-    #         # early return: 궤적 점이 2개 미만이면 아무것도 렌더링하지 않음
-    #         if len(ball_trail) <= 1:
-    #             return
-    #
-    #         # 한 번만 서피스 생성
-    #         trail_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    #         points = []
-    #         for i, trail_pos in enumerate(ball_trail):
-    #             trail_screen = self.transform_ball(trail_pos)
-    #             if trail_screen.shape[0] > 0:
-    #                 x, y = int(trail_screen[0, 0] + offset_x), int(trail_screen[0, 1] + offset_y)
-    #                 if 0 <= x < SCREEN_WIDTH and 0 <= y < SCREEN_HEIGHT:
-    #                     points.append((x, y))
-    #
-    #         # 선 그리기
-    #         for i in range(len(points) - 1):
-    #             # 선의 알파 값 계산 (시작부분 투명, 끝부분 불투명)
-    #             alpha = int(255 * (i / (len(points) - 1)) ** 2)
-    #             alpha = max(10, min(255, alpha))  # 알파 값 10~255 사이로 제한
-    #             color_intensity = (i / (len(points) - 1)) ** 2
-    #             line_color = (
-    #                 int(COLORS['ball'][0] * color_intensity),
-    #                 int(COLORS['ball'][1] * color_intensity),
-    #                 int(COLORS['ball'][2] * color_intensity),
-    #                 alpha
-    #             )
-    #             pygame.draw.line(trail_surface, line_color, points[i], points[i + 1], int(BALL_RADIUS / 2))
-    #
-    #         # 서피스를 화면에 한 번만 붙임
-    #         self.screen.blit(trail_surface, (0, 0))
-    #     except Exception as e:
-    #         print(f"공 궤적 렌더링 중 오류: {e}")
 
     def render_trail(self, ball_trail: List[np.ndarray], offset_x: int, offset_y: int) -> None:
         """공 궤적 렌더링"""
@@ -314,7 +278,7 @@ class Renderer:
             if len(points) <= 1:
                 return
 
-            # 안티앨리어싱 선 그리기
+            # 모든 선을 단일 서피스에 그리기
             for i in range(len(points) - 1):
                 alpha = int(255 * (i / (len(points) - 1)) ** 0.5)
                 alpha = max(10, min(255, alpha))
@@ -325,10 +289,7 @@ class Renderer:
                     alpha
                 )
                 line_thickness = int(BALL_RADIUS * 1.7)
-                # 안티앨리어싱을 위해 임시 서피스 사용
-                temp_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-                pygame.draw.line(temp_surface, line_color, points[i], points[i + 1], line_thickness)
-                trail_surface.blit(temp_surface, (0, 0))
+                pygame.draw.line(trail_surface, line_color, points[i], points[i + 1], line_thickness)
 
             # 서피스 화면에 붙이기
             self.screen.blit(trail_surface, (0, 0))
