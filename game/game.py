@@ -87,6 +87,7 @@ class InputHandler:
         self.is_processing = False
         return False
 
+
 class Game:
     """게임의 주요 로직을 관리하는 클래스"""
     def __init__(self, camera, homography: np.ndarray):
@@ -97,6 +98,7 @@ class Game:
             self.renderer = Renderer(homography, camera)  # 렌더러
             self.clock = pygame.time.Clock()  # 프레임 제어용 클럭
             self.input_handler = InputHandler(self)  # 입력 핸들러
+            self.camera.start_processing()  # Start pose processing thread
         except Exception as e:
             print(f"게임 초기화 중 오류: {e}")
             raise
