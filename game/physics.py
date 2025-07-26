@@ -23,6 +23,7 @@ class Physics:
         self.ball_trail = []  # 공 궤적 저장
         self.goal_scored = False  # 골 이벤트 플래그
         self.collision_sound = None  # 충돌 사운드 객체
+        self.speed_multiplier = 1.0  # 공 속도 배율
         self._init_audio()  # 오디오 초기화
         self.reset_ball()  # 공 초기화
 
@@ -122,9 +123,11 @@ class Physics:
                 if self.check_collision(self.ball_pos, pos, config.BALL_RADIUS_RATIO):
                     self.ignore_collisions = True
                     self.target_side = 'left' if self.ball_pos[0] > MAX_SCREEN / 2 else 'right'
+                    # 공 속도 10% 증가
+                    self.speed_multiplier *= 1.1
                     self.ball_vel = np.array([
-                        -BALL_SPEED_SCALE if self.target_side == 'left' else BALL_SPEED_SCALE,
-                        random.uniform(-0.5 * BALL_SPEED_SCALE, 0.5 * BALL_SPEED_SCALE)
+                        -BALL_SPEED_SCALE * self.speed_multiplier if self.target_side == 'left' else BALL_SPEED_SCALE * self.speed_multiplier,
+                        random.uniform(-0.5 * BALL_SPEED_SCALE * self.speed_multiplier, 0.5 * BALL_SPEED_SCALE * self.speed_multiplier)
                     ])
                     print('충돌', self.ball_vel)
                     if self.collision_sound:
@@ -138,8 +141,8 @@ class Physics:
         try:
             self.ball_pos = np.array([MAX_SCREEN / 2, MAX_SCREEN / 2], dtype=float)
             self.ball_vel = np.array([
-                random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE,
-                random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE, 0.5 * INITIAL_BALL_SPEED_SCALE)
+                random.choice([-1, 1]) * INITIAL_BALL_SPEED_SCALE * self.speed_multiplier,
+                random.uniform(-0.5 * INITIAL_BALL_SPEED_SCALE * self.speed_multiplier, 0.5 * INITIAL_BALL_SPEED_SCALE * self.speed_multiplier)
             ], dtype=float)
             self.ignore_collisions = False
             self.target_side = None
@@ -152,6 +155,7 @@ class Physics:
         """게임 전체를 재시작"""
         try:
             self.score = [0, 0]
+            self.speed_multiplier = 1.0  # 속도 배율 초기화
             self.reset_ball()
             self.round_ended = False
             self.round_end_time = None
