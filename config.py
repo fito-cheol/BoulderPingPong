@@ -25,8 +25,8 @@ HITBOX_RADIUS = BALL_RADIUS
 HAND_RADIUS_RATIO = 1 / 20
 HAND_RADIUS = math.floor(HAND_RADIUS_RATIO * SCREEN_HEIGHT)
 
-BALL_SPEED_SCALE = 0.7
-INITIAL_BALL_SPEED_SCALE = 0.3
+BALL_SPEED_SCALE = 0.35
+INITIAL_BALL_SPEED_SCALE = 0.2
 ROUND_END_DELAY = 2.5
 
 GOAL_WIDTH = 0.2
@@ -44,7 +44,7 @@ COLORS = {
     'foot': (0, 220, 220),
     'ball': (255, 255, 255),
     'ball_border': (0, 0, 0),
-    'score': (120, 255, 120),
+    'score': (200, 255, 170),
     'text': (0, 255, 0),
     'landmark_default': (255, 255, 255),
     'connection': (0, 255, 255),
