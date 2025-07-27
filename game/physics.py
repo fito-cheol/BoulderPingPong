@@ -38,10 +38,28 @@ class Physics:
         except Exception as e:
             print(f"오디오 초기화 중 오류: {e}")
 
-    def check_collision(self, ball_pos: np.ndarray, hit_pos: np.ndarray, hit_radius: float) -> bool:
-        """공과 히트박스 간 충돌 감지"""
+    def transform_player_to_normalized(self, hit_pos: np.ndarray) -> np.ndarray:
+        """플레이어 좌표를 공의 정규화된 좌표계(0-1)로 변환"""
         try:
-            distance = np.linalg.norm(ball_pos - np.array(hit_pos))
+            hit_pos = np.array(hit_pos, dtype=np.float32)
+            if hit_pos.ndim == 1:
+                hit_pos = hit_pos.reshape(1, -2)
+            # Renderer.transform_player 변환 적용: points * [WALL_WIDTH, WALL_HEIGHT] + [FOCUS_X, FOCUS_Y]
+            transformed_pos = hit_pos * np.array([config.WALL_WIDTH, config.WALL_HEIGHT]) + np.array([config.FOCUS_X, config.FOCUS_Y])
+            # x좌표 반전 (1-x) 및 SCREEN_WIDTH, SCREEN_HEIGHT로 정규화
+            transformed_pos[:, 0] = transformed_pos[:, 0] / config.SCREEN_WIDTH
+            transformed_pos[:, 1] = transformed_pos[:, 1] / config.SCREEN_HEIGHT
+            return transformed_pos
+        except Exception as e:
+            print(f"플레이어 좌표 변환 중 오류: {e}")
+            return hit_pos
+
+    def check_collision(self, ball_pos: np.ndarray, hit_pos: np.ndarray, hit_radius: float) -> bool:
+        """공과 히트박스 간 충돌 감지 (정규화된 좌표계에서)"""
+        try:
+            # 플레이어 좌표를 공의 좌표계(0-1)로 변환
+            normalized_hit_pos = self.transform_player_to_normalized(hit_pos)
+            distance = np.linalg.norm(ball_pos - normalized_hit_pos)
             return distance < hit_radius
         except Exception as e:
             print(f"충돌 감지 중 오류: {e}")
