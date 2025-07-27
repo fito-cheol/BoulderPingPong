@@ -76,6 +76,14 @@ class CameraManager:
             if not self.reconnect_camera():
                 return None
         ret, frame = self.camera.read()
+
+        # 좌우 반전 적용
+        if frame is not None and self.config.flip_horizontal:
+            frame = cv2.flip(frame, 1)  # 1은 좌우 반전을 의미 (0은 상하, -1은 상하좌우)
+            # 반전된 프레임이 유효한지 확인
+            if frame.size == 0:
+                print("오류: 좌우 반전 후 잘못된 프레임")
+
         return frame if ret and frame is not None and frame.size > 0 else None
 
     def release(self) -> None:

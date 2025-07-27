@@ -39,36 +39,46 @@ class Camera:
         self.thread.start()
 
     def _process_frames(self):
-        """Process frames in a separate thread."""
-        while self.running:
+        """카메라 프레임을 별도의 스레드에서 처리하는 메서드"""
+        while self.running:  # 카메라 처리 루프가 실행 중일 때 반복
+            # 카메라 연결 상태 확인
             if not self.camera_manager.camera.isOpened():
+                # 카메라가 연결되어 있지 않으면 재연결 시도
                 if not self.camera_manager.reconnect_camera():
+                    # 재연결 실패 시 최대 재연결 시도 횟수 확인
                     if self.camera_manager.reconnect_attempts > self.config.max_reconnect_attempts:
-                        print("Error: Max reconnect attempts reached.")
-                        time.sleep(0.1)  # Prevent busy loop
+                        print("오류: 최대 재연결 시도 횟수 초과")
+                        time.sleep(0.1)  # 과도한 CPU 사용 방지를 위해 0.1초 대기
                         continue
                 continue
 
+            # 카메라에서 프레임 가져오기
             frame = self.camera_manager.get_frame()
             if frame is None:
-                print("Error: Failed to capture frame")
-                time.sleep(0.01)
+                print("오류: 프레임 캡처 실패")
+                time.sleep(0.01)  # 짧은 대기 후 다음 프레임 처리
                 continue
 
+            # 프레임 크기 유효성 검사
             if frame.shape[0] == 0 or frame.shape[1] == 0:
-                print("Error: Invalid frame dimensions")
-                time.sleep(0.01)
+                print("오류: 잘못된 프레임 크기")
+                time.sleep(0.01)  # 짧은 대기 후 다음 프레임 처리
                 continue
 
-            # Apply search margin if specified
+            # 검색 마진 적용
             if self.config.search_margin_x > 0 or self.config.search_margin_y > 0:
+                # 프레임의 높이와 너비 가져오기
                 height, width = frame.shape[:2]
+                # x축 마진 크기 계산 (프레임 너비에 마진 비율 곱하기)
                 margin_x = int(width * self.config.search_margin_x)
+                # y축 마진 크기 계산 (프레임 높이에 마진 비율 곱하기)
                 margin_y = int(height * self.config.search_margin_y)
-                frame = frame[margin_y:height-margin_y, margin_x:width-margin_x]
+                # 프레임의 상하좌우에서 마진만큼 잘라내기
+                frame = frame[margin_y:height - margin_y, margin_x:width - margin_x]
+                # 자른 프레임이 유효한지 확인
                 if frame.size == 0:
-                    print("Error: Invalid frame after applying margins")
-                    time.sleep(0.01)
+                    print("오류: 마진 적용 후 잘못된 프레임")
+                    time.sleep(0.01)  # 짧은 대기 후 다음 프레임 처리
                     continue
 
             timestamp_ms = int(time.time() * 1000)

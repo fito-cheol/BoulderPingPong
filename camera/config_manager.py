@@ -13,6 +13,7 @@ class CameraConfig:
     max_reconnect_attempts: int = 3
     search_margin_x: float = 0.1
     search_margin_y: float = 0.1
+    flip_horizontal: bool = True
     landmarks_to_track: Optional[List[int]] = None
 
     def __post_init__(self):
